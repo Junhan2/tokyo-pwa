@@ -14,156 +14,139 @@
 :root{--bg:#f5f5f5;--card:#fff;--text:#1a1a1a;--sub:#666;--dim:#999;--border:#e8e8e8;--accent:#1a1a1a;--tag:#f0f0f0;--gold:#b8860b;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--r:14px;--safe-b:env(safe-area-inset-bottom,0px)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-font-smoothing:antialiased}
-.app{display:flex;flex-direction:column;height:100dvh}
 
-/* Offline Banner */
+/* Layout */
+.app{display:flex;flex-direction:column;height:100dvh}
 .offline-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff6b35;color:#fff;text-align:center;padding:4px 16px;font-size:12px;font-weight:600;transform:translateY(-100%);transition:transform .3s ease;padding-top:calc(env(safe-area-inset-top,4px) + 4px)}
 .offline-banner.show{transform:translateY(0)}
 
 /* Header */
-.hdr{background:var(--card);padding:12px 16px;padding-top:calc(env(safe-area-inset-top,12px) + 8px);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
-.hdr-left h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
-.hdr-left .sub{font-size:10px;color:var(--dim);margin-top:1px}
-.env-pills{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.pill{font-size:9px;padding:3px 8px;border-radius:12px;background:var(--tag);color:var(--sub);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.hdr{background:var(--card);padding:8px 16px;padding-top:calc(env(safe-area-inset-top,8px) + 4px);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.hdr h1{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.hdr .sub{font-size:9px;color:var(--dim)}
+.env-pills{display:flex;gap:4px;flex-wrap:wrap}
+.pill{font-size:9px;padding:2px 6px;border-radius:10px;background:var(--tag);color:var(--sub);white-space:nowrap;display:flex;align-items:center;gap:2px}
 .pill b{color:var(--text);font-weight:600}
 .pill.good b{color:var(--green)}.pill.mod b{color:var(--orange)}.pill.bad b{color:var(--red)}
 
-/* Content area */
-.content{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;padding-bottom:calc(72px + var(--safe-b))}
-.page.on{display:block}
-.page.map-page{padding-bottom:calc(72px + var(--safe-b));overflow:hidden}
-
-/* Bottom Tab Bar */
-.btab{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-b);z-index:100}
-.btab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;cursor:pointer;color:var(--dim);transition:color .15s;font-size:10px;gap:2px;border:none;background:none;font-family:inherit}
-.btab-item.on{color:var(--accent);font-weight:600}
-.btab-item .ico{font-size:20px;line-height:1}
-
 /* Day Tabs */
-.dtabs{display:flex;gap:6px;padding:12px 16px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.dtabs{display:flex;gap:6px;padding:8px 16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;background:var(--card);border-bottom:1px solid var(--border)}
 .dtabs::-webkit-scrollbar{display:none}
-.dtab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--dim);transition:all .15s;white-space:nowrap;position:relative}
+.dtab{flex-shrink:0;padding:5px 12px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--dim);transition:all .15s;white-space:nowrap;position:relative}
 .dtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.dtab .today-dot{width:6px;height:6px;border-radius:50%;background:var(--green);position:absolute;top:4px;right:4px}
+.dtab .today-dot{width:6px;height:6px;border-radius:50%;background:var(--green);position:absolute;top:2px;right:2px}
 .dtab.on .today-dot{background:#fff}
 
-/* Spot Cards */
-.spots{padding:0 16px 16px}
-.scard{background:var(--card);border-radius:var(--r);margin-bottom:0;border:1px solid var(--border);overflow:hidden;transition:border-color .15s}
-.scard.visited{opacity:.65}
-.scard-top{padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
-.scard-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
-.scard-num.eat{background:var(--gold)}
-.scard-num.shop{background:#888}
-.scard-num.snack{background:#aaa}
-.scard-info{flex:1;min-width:0}
-.scard-name{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
-.scard-name .ja{font-size:11px;color:var(--dim);font-weight:400}
-.scard-time{font-size:11px;color:var(--sub);margin-top:2px}
-.scard-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
-.stag{font-size:9px;padding:2px 8px;border-radius:10px;background:var(--tag);color:var(--sub)}
-.scard-detail{padding:0 16px 14px;font-size:12px;color:var(--sub);line-height:1.7;border-top:1px solid var(--border);margin-top:0;padding-top:12px}
-.scard-detail .tip{background:#fafafa;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:11px}
-.scard-actions{display:flex;gap:8px;margin-top:10px}
-.scard-actions button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
-.scard-actions button:active{background:var(--tag)}
-.scard-actions button.done{background:var(--accent);color:#fff;border-color:var(--accent)}
-.memo-area{margin-top:8px}
-.memo-area textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:60px;outline:none}
-
-/* Deep link buttons */
-.deeplink-row{display:flex;gap:6px;margin-top:8px}
-.deeplink-btn{flex:1;padding:8px 6px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;color:var(--text);display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s}
-.deeplink-btn:active{background:var(--tag)}
-
-/* Transit Connectors */
-.transit-conn{display:flex;align-items:center;gap:8px;padding:6px 16px 6px 30px;color:var(--dim);font-size:11px;position:relative}
-.transit-conn::before{content:'';position:absolute;left:29px;top:0;bottom:0;width:1px;border-left:2px dashed var(--border)}
-.transit-icon{font-size:14px;z-index:1;background:var(--bg);padding:2px 0}
-.transit-time{color:var(--sub);font-weight:500}
-
 /* Map */
+.map-wrap{flex-shrink:0;height:200px;position:relative;border-bottom:1px solid var(--border);background:#e8e8e8}
 #map{width:100%;height:100%}
+.map-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--dim);font-size:12px;background:var(--bg)}
+.map-loading.hide{display:none}
 
-/* Map Fallback */
-.map-fallback{padding:16px;overflow-y:auto;height:100%}
-.map-fallback-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--sub)}
-.map-fb-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:8px}
-.map-fb-item .name{font-size:13px;font-weight:600}
-.map-fb-item .meta{font-size:11px;color:var(--sub);margin-top:2px}
-.map-fb-links{display:flex;gap:6px;margin-top:8px}
-.map-fb-links a{font-size:11px;color:var(--accent);text-decoration:none;font-weight:500}
-
-/* Nearby / Discover */
-.nb-bar{padding:12px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
-.nb-bar::-webkit-scrollbar{display:none}
-.nb-chip{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--sub);transition:all .15s}
-.nb-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
-.nb-list{padding:0 16px 16px}
-.nb-item{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;border:1px solid var(--border)}
-.nb-item-name{font-size:14px;font-weight:600}
-.nb-item-meta{font-size:11px;color:var(--sub);margin-top:3px;display:flex;align-items:center;gap:8px}
-.nb-item-meta .star{color:var(--gold)}
-.nb-item-addr{font-size:11px;color:var(--dim);margin-top:4px}
-.nb-item-link{display:inline-block;margin-top:6px;font-size:11px;color:var(--accent);text-decoration:none;font-weight:500}
-.nb-status{text-align:center;padding:40px 16px;color:var(--dim);font-size:13px}
-.nb-gps-btn{display:block;margin:12px auto;padding:10px 24px;border-radius:20px;border:1px solid var(--accent);background:var(--card);font-size:13px;cursor:pointer;font-family:inherit;font-weight:500}
-.nb-map-wrap{height:220px;margin:0 16px 12px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
-
-/* Tools */
-.tool-section{padding:16px}
-.tool-card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--border)}
-.tool-card h3{font-size:14px;font-weight:600;margin-bottom:10px}
-.tool-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-.tool-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
-.tool-input:focus{border-color:var(--accent)}
-.tool-result{font-size:20px;font-weight:700;text-align:center;padding:8px 0}
-.tool-rate{font-size:11px;color:var(--dim);text-align:center}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.info-item{background:#fafafa;padding:10px 12px;border-radius:8px}
-.info-item .label{font-size:10px;color:var(--dim);margin-bottom:2px}
-.info-item .value{font-size:13px;font-weight:600}
-.info-item .value a{color:var(--accent);text-decoration:none}
-.emer-list{display:flex;flex-direction:column;gap:6px}
-.emer-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fafafa;border-radius:8px}
-.emer-item .name{font-size:12px;font-weight:500}
-.emer-item a{font-size:13px;font-weight:700;color:var(--accent);text-decoration:none}
-.transport-tip{font-size:12px;color:var(--sub);line-height:1.7;padding:6px 0}
-.transport-tip b{color:var(--text)}
-
-/* Bookmark star */
-.bk-star{cursor:pointer;font-size:16px;opacity:.3;transition:opacity .15s}
-.bk-star.on{opacity:1}
-
-/* Loading */
-.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:20px;color:var(--dim);font-size:12px}
-.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* Main scrollable area */
+.main-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(52px + var(--safe-b))}
 
 /* Day summary */
-.day-summary{padding:12px 16px;font-size:12px;color:var(--sub);line-height:1.6;background:var(--card);margin:0 16px 12px;border-radius:var(--r);border:1px solid var(--border)}
-.day-summary .weather-row{display:flex;gap:12px;margin-top:6px}
-.day-summary .weather-row .wi{display:flex;align-items:center;gap:4px;font-size:11px}
+.day-summary{padding:10px 16px;font-size:11px;color:var(--sub);line-height:1.5;background:var(--card);border-bottom:1px solid var(--border)}
+
+/* Spot Cards */
+.spots{padding:8px 16px 16px}
+.scard{background:var(--card);border-radius:var(--r);margin-bottom:0;border:1px solid var(--border);overflow:hidden}
+.scard.visited{opacity:.6}
+.scard-top{padding:12px 14px;cursor:pointer;display:flex;align-items:flex-start;gap:10px}
+.scard-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.scard-num.eat{background:var(--gold)}.scard-num.shop{background:#888}.scard-num.snack{background:#aaa}
+.scard-info{flex:1;min-width:0}
+.scard-name{font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
+.scard-name .ja{font-size:10px;color:var(--dim);font-weight:400}
+.scard-time{font-size:10px;color:var(--sub);margin-top:2px}
+.scard-tags{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap}
+.stag{font-size:9px;padding:2px 7px;border-radius:10px;background:var(--tag);color:var(--sub)}
+.scard-detail{padding:0 14px 12px;font-size:12px;color:var(--sub);line-height:1.6;border-top:1px solid var(--border);padding-top:10px}
+.scard-actions{display:flex;gap:6px;margin-top:8px}
+.scard-actions button{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;font-family:inherit}
+.scard-actions button:active{background:var(--tag)}
+.scard-actions button.done{background:var(--accent);color:#fff;border-color:var(--accent)}
+.deeplink-row{display:flex;gap:5px;margin-top:8px}
+.deeplink-btn{flex:1;padding:7px 4px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:10px;cursor:pointer;text-align:center;text-decoration:none;color:var(--text);display:flex;align-items:center;justify-content:center;gap:3px}
+.deeplink-btn:active{background:var(--tag)}
+.memo-area{margin-top:8px}
+.memo-area textarea{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:50px;outline:none}
+.bk-star{cursor:pointer;font-size:14px;opacity:.3;transition:opacity .15s}
+.bk-star.on{opacity:1}
+
+/* Transit Connectors */
+.transit-conn{display:flex;align-items:center;gap:6px;padding:4px 16px 4px 28px;color:var(--dim);font-size:10px;position:relative}
+.transit-conn::before{content:'';position:absolute;left:27px;top:0;bottom:0;border-left:2px dashed var(--border)}
+.transit-icon{font-size:12px;z-index:1;background:var(--bg);padding:1px 0}
+.transit-time{color:var(--sub);font-weight:500}
+
+/* Bottom Tab */
+.btab{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-b);z-index:100}
+.btab-item{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 0 6px;cursor:pointer;color:var(--dim);font-size:12px;font-weight:500;border:none;background:none;font-family:inherit;transition:color .15s}
+.btab-item.on{color:var(--accent);font-weight:700}
+
+/* Tools */
+.tool-section{padding:12px 16px 16px}
+.tool-card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;border:1px solid var(--border)}
+.tool-card h3{font-size:13px;font-weight:600;margin-bottom:8px}
+.tool-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.tool-input{flex:1;padding:9px 10px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.tool-input:focus{border-color:var(--accent)}
+.tool-rate{font-size:10px;color:var(--dim);text-align:center}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.info-item{background:#fafafa;padding:8px 10px;border-radius:8px}
+.info-item .label{font-size:9px;color:var(--dim);margin-bottom:1px}
+.info-item .value{font-size:12px;font-weight:600}
+.emer-list{display:flex;flex-direction:column;gap:5px}
+.emer-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#fafafa;border-radius:8px}
+.emer-item .name{font-size:11px;font-weight:500}
+.emer-item a{font-size:13px;font-weight:700;color:var(--accent);text-decoration:none}
+.transport-tip{font-size:11px;color:var(--sub);line-height:1.6}
+.transport-tip b{color:var(--text)}
+
+/* Nearby */
+.nb-bar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
+.nb-bar::-webkit-scrollbar{display:none}
+.nb-chip{flex-shrink:0;padding:5px 12px;border-radius:16px;font-size:11px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--sub)}
+.nb-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nb-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.nb-item:last-child{border-bottom:none}
+.nb-item-name{font-size:12px;font-weight:600}
+.nb-item-meta{font-size:10px;color:var(--sub);margin-top:2px}
+.nb-item-link{font-size:10px;color:var(--accent);text-decoration:none;font-weight:500}
+.nb-gps-btn{display:block;margin:8px auto;padding:8px 20px;border-radius:16px;border:1px solid var(--accent);background:var(--card);font-size:12px;cursor:pointer;font-family:inherit;font-weight:500}
+
+/* Loading */
+.spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<!-- Offline Banner (outside #app) -->
 <div class="offline-banner" id="offlineBanner">📡 오프라인 모드 — 캐시된 데이터 사용 중</div>
 
-<div id="app" class="app"></div>
+<div class="app">
+  <header class="hdr" id="hdr">
+    <div><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17</div></div>
+    <div class="env-pills" id="envPills"><div class="pill">로딩...</div></div>
+  </header>
+  <nav class="dtabs" id="dayTabs"></nav>
+  <div class="map-wrap" id="mapWrap">
+    <div id="map"></div>
+    <div class="map-loading" id="mapLoading"><div class="spinner"></div> 지도 로딩 중...</div>
+  </div>
+  <div class="main-scroll" id="mainContent"></div>
+  <nav class="btab" id="btab"></nav>
+</div>
 
 <script>
-// === CONFIG ===
-const API_KEY = 'AIzaSyBNOf3Kz4ehJzLJ8D20WWoaI8qYu3dcI0s';
-const HOTEL = { lat: 35.7102, lng: 139.8116, name: 'Richmond Hotel Tokyo Skhole' };
+var API_KEY = 'AIzaSyBNOf3Kz4ehJzLJ8D20WWoaI8qYu3dcI0s';
+var HOTEL = {lat:35.7102,lng:139.8116};
 
-// === DATA: 5-Day Itinerary ===
-const DAYS = [
+var DAYS = [
   {
-    date:'2/13 (목)', label:'Day 1', title:'도착 · 아사쿠사', isoDate:'2026-02-13',
-    summary:'나리타 도착 → 스카이라이너로 우에노 → 오시아게 호텔 체크인 후 아사쿠사 산책. 센소지와 나카미세도리를 천천히 둘러보고 저녁은 현지 이자카야에서.',
+    date:'2/13 (목)',label:'Day 1',title:'도착 · 아사쿠사',isoDate:'2026-02-13',
+    summary:'나리타 → 스카이라이너 우에노 → 오시아게 체크인 → 아사쿠사 산책 → 이자카야 저녁',
     transit:[
       {icon:'🚄',mode:'스카이라이너+전철',time:'70분'},
       {icon:'🚶',mode:'도보',time:'3분'},
@@ -179,12 +162,12 @@ const DAYS = [
       {name:'센소지',ja:'浅草寺',time:'17:00',type:'spot',lat:35.7148,lng:139.7967,note:'아사쿠사의 상징. 저녁 무렵 라이트업이 아름다움.',tags:['사찰','필수']},
       {name:'나카미세도리',ja:'仲見世通り',time:'17:30',type:'shop',lat:35.7135,lng:139.7966,note:'닝교야끼, 아게만쥬 등 간식 거리.',tags:['쇼핑','간식']},
       {name:'카게츠도 메론빵',ja:'花月堂',time:'17:45',type:'snack',lat:35.7145,lng:139.7941,note:'얼굴 크기 메론빵. 아사쿠사 필수 간식.',tags:['간식','필수']},
-      {name:'호프만 (저녁)',ja:'ホッピー通り',time:'19:00',type:'eat',lat:35.7118,lng:139.7960,note:'홋피도리(호프만 거리). 현지인 분위기 이자카야 골목. 모츠니코미 추천.',tags:['저녁','이자카야','현지맛집']}
+      {name:'호프만 (저녁)',ja:'ホッピー通り',time:'19:00',type:'eat',lat:35.7118,lng:139.7960,note:'홋피도리. 현지인 분위기 이자카야 골목. 모츠니코미 추천.',tags:['저녁','이자카야','현지맛집']}
     ]
   },
   {
-    date:'2/14 (금)', label:'Day 2', title:'후지산 투어', isoDate:'2026-02-14',
-    summary:'마이리얼트립 한국어 가이드 후지산 1일 투어. 도쿄역 7:45 집합, 8:00 출발. 혼마치 거리 → 아라쿠라야마 센겐 공원 → 오시노 핫카이 → 가와구치코. 저녁은 오시아게 복귀 후.',
+    date:'2/14 (금)',label:'Day 2',title:'후지산 투어',isoDate:'2026-02-14',
+    summary:'마이리얼트립 후지산 1일 투어. 도쿄역 7:45 집합 → 혼마치 → 센겐공원 → 오시노핫카이 → 가와구치코',
     transit:[
       {icon:'🚇',mode:'한조몬선→오테마치',time:'20분'},
       {icon:'🚌',mode:'투어버스',time:'120분'},
@@ -195,18 +178,18 @@ const DAYS = [
       {icon:'🚶',mode:'도보',time:'5분'}
     ],
     spots:[
-      {name:'도쿄역 집합',ja:'東京駅 丸の内南口',time:'07:45',type:'transport',lat:35.6812,lng:139.7671,note:'마루노우치 남쪽 출구 → 신마루노우치 빌딩 BEAMS 간판 아래 1층. 오시아게에서 한조몬선→오테마치 약 20분.',tags:['집합','마이리얼트립']},
+      {name:'도쿄역 집합',ja:'東京駅 丸の内南口',time:'07:45',type:'transport',lat:35.6812,lng:139.7671,note:'마루노우치 남쪽 출구 → 신마루노우치 빌딩 BEAMS 간판 아래.',tags:['집합','마이리얼트립']},
       {name:'혼마치 거리',ja:'本町通り',time:'10:00',type:'spot',lat:35.4875,lng:138.8031,note:'후지요시다 레트로 쇼핑 스트리트. 후지산 배경 포토스팟.',tags:['투어','포토스팟']},
-      {name:'아라쿠라야마 센겐 공원',ja:'新倉山浅間公園',time:'11:30',type:'spot',lat:35.5031,lng:138.7989,note:'오층탑 + 후지산 = 일본 대표 풍경. 397계단 올라가야 함.',tags:['투어','절경','필수']},
-      {name:'오시노 핫카이',ja:'忍野八海',time:'13:30',type:'spot',lat:35.4612,lng:138.8312,note:'후지산 눈녹은 물이 만든 8개의 맑은 연못. 두부 아이스크림 추천.',tags:['투어','자연']},
-      {name:'가와구치코',ja:'河口湖',time:'15:00',type:'spot',lat:35.5162,lng:138.7520,note:'가와구치코 자연생활관. 후지산 + 호수 전경.',tags:['투어','호수']},
+      {name:'아라쿠라야마 센겐 공원',ja:'新倉山浅間公園',time:'11:30',type:'spot',lat:35.5031,lng:138.7989,note:'오층탑 + 후지산 = 일본 대표 풍경. 397계단.',tags:['투어','절경','필수']},
+      {name:'오시노 핫카이',ja:'忍野八海',time:'13:30',type:'spot',lat:35.4612,lng:138.8312,note:'후지산 눈녹은 물 8개 연못. 두부 아이스크림 추천.',tags:['투어','자연']},
+      {name:'가와구치코',ja:'河口湖',time:'15:00',type:'spot',lat:35.5162,lng:138.7520,note:'후지산 + 호수 전경.',tags:['투어','호수']},
       {name:'호텔 복귀',ja:'',time:'18:30',type:'transport',lat:35.7102,lng:139.8116,note:'투어 종료 후 오시아게 복귀.',tags:['이동']},
-      {name:'덴노스케 (저녁)',ja:'でんのすけ',time:'19:30',type:'eat',lat:35.7108,lng:139.8130,note:'오시아게역 근처 오뎅 이자카야. 따뜻한 오뎅으로 하루 마무리.',tags:['저녁','오뎅','현지맛집']}
+      {name:'덴노스케 (저녁)',ja:'でんのすけ',time:'19:30',type:'eat',lat:35.7108,lng:139.8130,note:'오시아게역 근처 오뎅 이자카야. 따뜻한 오뎅.',tags:['저녁','오뎅','현지맛집']}
     ]
   },
   {
-    date:'2/15 (토)', label:'Day 3', title:'츠키지 · 긴자 · 시부야', isoDate:'2026-02-15',
-    summary:'아침은 츠키지 시장에서 해산물 먹방. 긴자에서 쇼핑 후 시부야로 이동. 하치코 → 시부야 스크램블 → 시부야 스카이 전망대.',
+    date:'2/15 (토)',label:'Day 3',title:'츠키지 · 긴자 · 시부야',isoDate:'2026-02-15',
+    summary:'츠키지 먹방 → 긴자 쇼핑 → 시부야 하치코·스크램블·스카이 전망대',
     transit:[
       {icon:'🚇',mode:'전철',time:'30분'},
       {icon:'🚶',mode:'도보',time:'15분'},
@@ -217,18 +200,18 @@ const DAYS = [
       {icon:'🚶',mode:'도보',time:'5분'}
     ],
     spots:[
-      {name:'츠키지 시장',ja:'築地場外市場',time:'09:00',type:'eat',lat:35.6654,lng:139.7707,note:'타마고야키, 해산물 덮밥, 스시 등. 아침 겸 점심으로 먹방.',tags:['아침','시장','먹방']},
-      {name:'긴자 산책',ja:'銀座',time:'11:30',type:'shop',lat:35.6722,lng:139.7649,note:'유니클로 긴자점, 무인양품, 이토야 문구 등.',tags:['쇼핑','거리']},
-      {name:'긴자 사이토 (점심)',ja:'銀座さいとう',time:'12:30',type:'eat',lat:35.6710,lng:139.7632,note:'두툼한 돈카츠 명가. 점심 줄 서지만 빠르게 회전.',tags:['점심','돈카츠','명가']},
-      {name:'시부야 하치코',ja:'忠犬ハチ公像',time:'14:30',type:'spot',lat:35.6590,lng:139.7006,note:'시부야역 앞 하치코 동상. 포토스팟.',tags:['랜드마크','포토스팟']},
-      {name:'시부야 스크램블',ja:'渋谷スクランブル交差点',time:'14:45',type:'spot',lat:35.6595,lng:139.7004,note:'세계에서 가장 바쁜 교차로. 스타벅스 2층에서 내려다보기.',tags:['랜드마크']},
+      {name:'츠키지 시장',ja:'築地場外市場',time:'09:00',type:'eat',lat:35.6654,lng:139.7707,note:'타마고야키, 해산물 덮밥, 스시. 아침 겸 점심 먹방.',tags:['아침','시장','먹방']},
+      {name:'긴자 산책',ja:'銀座',time:'11:30',type:'shop',lat:35.6722,lng:139.7649,note:'유니클로 긴자점, 무인양품, 이토야 문구.',tags:['쇼핑','거리']},
+      {name:'긴자 사이토 (점심)',ja:'銀座さいとう',time:'12:30',type:'eat',lat:35.6710,lng:139.7632,note:'두툼한 돈카츠 명가. 빠르게 회전.',tags:['점심','돈카츠','명가']},
+      {name:'시부야 하치코',ja:'忠犬ハチ公像',time:'14:30',type:'spot',lat:35.6590,lng:139.7006,note:'시부야역 앞 하치코 동상.',tags:['랜드마크','포토스팟']},
+      {name:'시부야 스크램블',ja:'渋谷スクランブル交差点',time:'14:45',type:'spot',lat:35.6595,lng:139.7004,note:'세계에서 가장 바쁜 교차로. 스타벅스 2층.',tags:['랜드마크']},
       {name:'시부야 스카이',ja:'SHIBUYA SKY',time:'15:30',type:'spot',lat:35.6584,lng:139.7024,note:'230m 옥상 전망대. 해질녘 추천. 사전 예매 필수.',tags:['전망대','예매필수']},
-      {name:'규카츠 모토무라 (저녁)',ja:'牛かつもと村',time:'18:00',type:'eat',lat:35.6612,lng:139.6980,note:'바삭한 규카츠를 돌판에 구워 먹는 맛. 시부야점.',tags:['저녁','규카츠','인기']}
+      {name:'규카츠 모토무라 (저녁)',ja:'牛かつもと村',time:'18:00',type:'eat',lat:35.6612,lng:139.6980,note:'바삭한 규카츠를 돌판에 구워 먹는 맛.',tags:['저녁','규카츠','인기']}
     ]
   },
   {
-    date:'2/16 (일)', label:'Day 4', title:'하라주쿠 · 신주쿠', isoDate:'2026-02-16',
-    summary:'하라주쿠에서 다케시타도리, 오모테산도 거리 산책. 메이지진구 참배 후 신주쿠로 이동. 가부키초 타워, 골든가이 탐방.',
+    date:'2/16 (일)',label:'Day 4',title:'하라주쿠 · 신주쿠',isoDate:'2026-02-16',
+    summary:'메이지진구 → 다케시타도리·오모테산도 → 신주쿠 가부키초·골든가이·오모이데요코초',
     transit:[
       {icon:'🚇',mode:'전철',time:'35분'},
       {icon:'🚶',mode:'도보',time:'10분'},
@@ -240,19 +223,19 @@ const DAYS = [
       {icon:'🚶',mode:'도보',time:'5분'}
     ],
     spots:[
-      {name:'메이지진구',ja:'明治神宮',time:'09:30',type:'spot',lat:35.6764,lng:139.6993,note:'도심 속 거대한 숲. 아침에 방문하면 한적하고 경건.',tags:['신사','필수','아침추천']},
-      {name:'다케시타도리',ja:'竹下通り',time:'11:00',type:'shop',lat:35.6702,lng:139.7025,note:'하라주쿠의 상징. 크레이프, 솜사탕, 개성 넘치는 가게들.',tags:['쇼핑','거리']},
-      {name:'하라주쿠 크레이프',ja:'マリオンクレープ',time:'11:20',type:'snack',lat:35.6699,lng:139.7027,note:'다케시타도리 입구. 딸기 초코 크레이프 추천.',tags:['간식']},
+      {name:'메이지진구',ja:'明治神宮',time:'09:30',type:'spot',lat:35.6764,lng:139.6993,note:'도심 속 거대한 숲. 아침에 한적하고 경건.',tags:['신사','필수']},
+      {name:'다케시타도리',ja:'竹下通り',time:'11:00',type:'shop',lat:35.6702,lng:139.7025,note:'하라주쿠의 상징. 크레이프, 솜사탕.',tags:['쇼핑','거리']},
+      {name:'하라주쿠 크레이프',ja:'マリオンクレープ',time:'11:20',type:'snack',lat:35.6699,lng:139.7027,note:'딸기 초코 크레이프 추천.',tags:['간식']},
       {name:'오모테산도',ja:'表参道',time:'11:45',type:'shop',lat:35.6654,lng:139.7121,note:'세련된 가로수길. 건축물 자체가 볼거리.',tags:['쇼핑','건축']},
-      {name:'카모토네기 (점심)',ja:'鴨to葱',time:'12:30',type:'eat',lat:35.6670,lng:139.7090,note:'오리 라멘 명가. 진한 국물과 오리고기가 일품.',tags:['점심','라멘','명가']},
+      {name:'카모토네기 (점심)',ja:'鴨to葱',time:'12:30',type:'eat',lat:35.6670,lng:139.7090,note:'오리 라멘 명가. 진한 국물.',tags:['점심','라멘','명가']},
       {name:'신주쿠 가부키초 타워',ja:'歌舞伎町タワー',time:'15:00',type:'spot',lat:35.6946,lng:139.7015,note:'2023 오픈. 엔터테인먼트 복합시설.',tags:['랜드마크','신규']},
-      {name:'신주쿠 골든가이',ja:'新宿ゴールデン街',time:'17:00',type:'spot',lat:35.6944,lng:139.7041,note:'좁은 골목에 200개 이상 작은 바. 분위기 자체가 매력.',tags:['거리','바']},
-      {name:'오모이데 요코초 (저녁)',ja:'思い出横丁',time:'19:00',type:'eat',lat:35.6932,lng:139.6985,note:'신주쿠 서쪽 출구 야키토리 골목. 연기 자욱한 레트로 분위기.',tags:['저녁','야키토리','골목맛집']}
+      {name:'신주쿠 골든가이',ja:'新宿ゴールデン街',time:'17:00',type:'spot',lat:35.6944,lng:139.7041,note:'좁은 골목에 200+ 작은 바.',tags:['거리','바']},
+      {name:'오모이데 요코초 (저녁)',ja:'思い出横丁',time:'19:00',type:'eat',lat:35.6932,lng:139.6985,note:'야키토리 골목. 연기 자욱한 레트로 분위기.',tags:['저녁','야키토리','골목맛집']}
     ]
   },
   {
-    date:'2/17 (월)', label:'Day 5', title:'마지막 쇼핑 · 출발', isoDate:'2026-02-17',
-    summary:'오전에 아키하바라 또는 우에노에서 마지막 쇼핑. 오후 나리타 공항으로 이동.',
+    date:'2/17 (월)',label:'Day 5',title:'쇼핑 · 출발',isoDate:'2026-02-17',
+    summary:'아키하바라/우에노 마지막 쇼핑 → 스카이라이너로 나리타 공항',
     transit:[
       {icon:'🚇',mode:'전철',time:'20분'},
       {icon:'🚇',mode:'전철',time:'5분'},
@@ -260,590 +243,394 @@ const DAYS = [
       {icon:'🚄',mode:'스카이라이너',time:'41분'}
     ],
     spots:[
-      {name:'호텔 체크아웃',ja:'',time:'10:00',type:'hotel',lat:35.7102,lng:139.8116,note:'짐은 프론트에 맡기고 가볍게 이동.',tags:['체크아웃']},
-      {name:'아키하바라',ja:'秋葉原',time:'10:30',type:'shop',lat:35.6984,lng:139.7731,note:'전자제품, 피규어, 면세 쇼핑. 요도바시 카메라 추천.',tags:['쇼핑','전자제품']},
-      {name:'우에노 아메요코',ja:'アメ横',time:'11:30',type:'shop',lat:35.7089,lng:139.7745,note:'재래시장 분위기. 간식, 건어물, 화장품 등.',tags:['쇼핑','시장']},
-      {name:'점심',ja:'',time:'12:00',type:'eat',lat:35.7089,lng:139.7745,note:'우에노/아키하바라 근처에서 가볍게. 라멘이나 소바.',tags:['점심']},
-      {name:'나리타 공항 이동',ja:'成田空港',time:'14:00',type:'transport',lat:35.7647,lng:140.3864,note:'우에노 → 스카이라이너 41분. 출발 2시간 전 도착 목표.',tags:['출발','스카이라이너']}
+      {name:'호텔 체크아웃',ja:'',time:'10:00',type:'hotel',lat:35.7102,lng:139.8116,note:'짐은 프론트에 맡기고 가볍게.',tags:['체크아웃']},
+      {name:'아키하바라',ja:'秋葉原',time:'10:30',type:'shop',lat:35.6984,lng:139.7731,note:'전자제품, 피규어, 면세. 요도바시 카메라.',tags:['쇼핑','전자제품']},
+      {name:'우에노 아메요코',ja:'アメ横',time:'11:30',type:'shop',lat:35.7089,lng:139.7745,note:'재래시장 분위기. 간식, 건어물, 화장품.',tags:['쇼핑','시장']},
+      {name:'점심',ja:'',time:'12:00',type:'eat',lat:35.7089,lng:139.7745,note:'우에노 근처 가볍게. 라멘이나 소바.',tags:['점심']},
+      {name:'나리타 공항 이동',ja:'成田空港',time:'14:00',type:'transport',lat:35.7647,lng:140.3864,note:'우에노 → 스카이라이너 41분. 출발 2시간 전 도착.',tags:['출발','스카이라이너']}
     ]
   }
 ];
 
-const TYPE_IC = {spot:'📍',eat:'🍽️',snack:'🍡',shop:'🛍️',transport:'🚃',hotel:'🏨'};
-const NB_TYPES = [
-  {id:'restaurant',label:'맛집',icon:'🍽️',google:'restaurant'},
-  {id:'cafe',label:'카페',icon:'☕',google:'cafe'},
-  {id:'convenience_store',label:'편의점',icon:'🏪',google:'convenience_store'},
-  {id:'tourist_attraction',label:'관광지',icon:'🏛️',google:'tourist_attraction'},
-  {id:'shopping_mall',label:'쇼핑',icon:'🛍️',google:'shopping_mall'},
-  {id:'drugstore',label:'드럭스토어',icon:'💊',google:'drugstore'}
-];
+var TYPE_IC = {spot:'📍',eat:'🍽️',snack:'🍡',shop:'🛍️',transport:'🚃',hotel:'🏨'};
 
-// === STATE ===
-let st = {
-  tab: 0,
-  day: 0,
-  expanded: null,
-  nbType: 'restaurant',
-  nbResults: [],
-  nbLoading: false,
-  userLat: null,
-  userLng: null
-};
-let map = null, mapNb = null, markers = [], markersNb = [], polyline = null;
-let weatherData = null, aqiData = null;
-let mapLoadFailed = false;
+// State
+var st = {tab:0, day:0, expanded:null, nbType:'restaurant', nbResults:[], nbLoading:false, userLat:null, userLng:null};
+var map = null, markers = [], polyline = null;
+var weatherData = null, aqiData = null;
+var mapReady = false;
+var exchangeRate = 0.1085;
 
-// === AUTO-DAY DETECTION (JST) ===
-function detectTodayIndex(){
-  const jstDate = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'});
-  return DAYS.findIndex(d=>d.isoDate===jstDate);
-}
-(function autoSelectDay(){
-  const idx = detectTodayIndex();
+// Auto-day (JST)
+(function(){
+  var jst = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'});
+  var idx = DAYS.findIndex(function(d){return d.isoDate===jst});
   if(idx>=0) st.day = idx;
 })();
 
-// === STORAGE ===
+// Storage
 function ls(k,v){
   if(v===undefined) try{return JSON.parse(localStorage.getItem('tk26_'+k))}catch(e){return null}
-  localStorage.setItem('tk26_'+k, JSON.stringify(v));
+  localStorage.setItem('tk26_'+k,JSON.stringify(v));
 }
 function isVisited(d,s){return !!(ls('visited')||{})[d+'-'+s]}
-function toggleVisited(d,s){const v=ls('visited')||{};const k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('visited',v);render()}
+function toggleVisited(d,s){var v=ls('visited')||{};var k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('visited',v);render()}
 function isBk(d,s){return !!(ls('bk')||{})[d+'-'+s]}
-function toggleBk(d,s){const v=ls('bk')||{};const k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('bk',v);render()}
-function getMemo(d,s){return (ls('memos')||{})[d+'-'+s]||''}
-function setMemo(d,s,txt){const m=ls('memos')||{};m[d+'-'+s]=txt;if(!txt)delete m[d+'-'+s];ls('memos',m)}
+function toggleBk(d,s){var v=ls('bk')||{};var k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('bk',v);render()}
+function getMemo(d,s){return(ls('memos')||{})[d+'-'+s]||''}
+function setMemo(d,s,t){var m=ls('memos')||{};m[d+'-'+s]=t;if(!t)delete m[d+'-'+s];ls('memos',m)}
 
-// === DEEP LINK HELPERS ===
-function openGoogleMapsApp(lat,lng,name){
-  const encoded = encodeURIComponent(name);
-  const appUrl = 'comgooglemaps://?q='+lat+','+lng+'&label='+encoded;
-  const webUrl = 'https://www.google.com/maps/search/?api=1&query='+lat+','+lng;
-  window.location = appUrl;
-  setTimeout(function(){ window.open(webUrl,'_blank'); },500);
+// Load cached rate
+(function(){var c=ls('rateCache');if(c&&c.rate)exchangeRate=c.rate})();
+
+// Deep links
+function openGMap(lat,lng,name){
+  window.location='comgooglemaps://?q='+lat+','+lng+'&label='+encodeURIComponent(name);
+  setTimeout(function(){window.open('https://www.google.com/maps/search/?api=1&query='+lat+','+lng,'_blank')},500);
 }
-function openAppleMaps(lat,lng,name){
-  const encoded = encodeURIComponent(name);
-  window.location = 'maps://?q='+encoded+'&ll='+lat+','+lng;
+function openAMap(lat,lng,name){
+  window.location='maps://?q='+encodeURIComponent(name)+'&ll='+lat+','+lng;
 }
-function openTransitDirections(lat,lng){
+function openTransit(lat,lng){
   window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng+'&travelmode=transit','_blank');
 }
 
 // === RENDER ===
 function render(){
-  // Reset map references since innerHTML destroys DOM nodes
-  map = null; mapNb = null;
-  const app = document.getElementById('app');
-  app.innerHTML = renderHeader() + '<div class="content">' +
-    renderItinerary() + renderMapPage() + renderNearby() + renderTools() +
-    '</div>' + renderBottomTab();
-  bindEvents();
-  if(st.tab === 1) initMapIfNeeded();
-  if(st.tab === 2 && st.userLat && st.nbResults.length) initMapIfNeeded();
+  renderDayTabs();
+  renderMainContent();
+  renderBottomTab();
+  updateMapVisibility();
+  if(mapReady && st.tab===0) updateMapMarkers();
 }
 
-function renderHeader(){
-  let env = '<div class="pill">로딩...</div>';
-  if(weatherData || aqiData){
-    let pills = [];
-    if(weatherData){
-      const t = weatherData.temperature?.degrees;
-      const h = weatherData.humidity?.percent;
-      if(t!==undefined) pills.push('<div class="pill">🌡 <b>'+Math.round(t)+'°</b></div>');
-      if(h!==undefined) pills.push('<div class="pill">💧 <b>'+h+'%</b></div>');
-    }
-    if(aqiData){
-      const idx = aqiData.indexes?.[0];
-      const aqi = idx?.aqi;
-      const pm25 = aqiData.pollutants?.find(function(p){return p.code==='pm25'});
-      const cls = aqi<=50?'good':aqi<=100?'mod':'bad';
-      const lbl = aqi<=50?'좋음':aqi<=100?'보통':'나쁨';
-      if(aqi) pills.push('<div class="pill '+cls+'">AQI <b>'+aqi+' '+lbl+'</b></div>');
-      if(pm25) pills.push('<div class="pill '+cls+'">PM2.5 <b>'+pm25.concentration?.value?.toFixed(1)+'</b></div>');
-    }
-    env = pills.join('');
-  }
-  return '<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills">'+env+'</div></div>';
+function renderDayTabs(){
+  var jst = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'});
+  var todayIdx = DAYS.findIndex(function(d){return d.isoDate===jst});
+  document.getElementById('dayTabs').innerHTML = DAYS.map(function(d,i){
+    return '<div class="dtab'+(st.day===i?' on':'')+'" data-day="'+i+'">'+d.label+(i===todayIdx?'<span class="today-dot"></span>':'')+'<br><span style="font-size:9px">'+d.date+'</span></div>';
+  }).join('');
+  document.querySelectorAll('.dtab').forEach(function(el){
+    el.onclick=function(){st.day=+el.dataset.day;st.expanded=null;render()};
+  });
 }
 
-function renderBottomTab(){
-  const tabs = [{ico:'📋',l:'일정'},{ico:'🗺️',l:'지도'},{ico:'📍',l:'주변'},{ico:'🔧',l:'도구'}];
-  return '<div class="btab">' + tabs.map(function(t,i){
-    return '<button class="btab-item'+(st.tab===i?' on':'')+'" data-tab="'+i+'"><span class="ico">'+t.ico+'</span>'+t.l+'</button>';
-  }).join('') + '</div>';
+function renderMainContent(){
+  var el = document.getElementById('mainContent');
+  if(st.tab===0) el.innerHTML = renderSpots();
+  else el.innerHTML = renderTools();
+  bindContentEvents();
 }
 
-function renderItinerary(){
-  const day = DAYS[st.day];
-  const todayIdx = detectTodayIndex();
-  var dtabs = '<div class="dtabs">' + DAYS.map(function(d,i){
-    return '<div class="dtab'+(st.day===i?' on':'')+'" data-day="'+i+'">'+d.label+(i===todayIdx?'<span class="today-dot"></span>':'')+'<br><span style="font-size:10px">'+d.date+'</span></div>';
-  }).join('') + '</div>';
-
-  var summary = '<div class="day-summary">'+day.summary+'</div>';
-
-  var spotsHtml = '<div class="spots">';
+function renderSpots(){
+  var day=DAYS[st.day];
+  var h='<div class="day-summary">'+day.summary+'</div><div class="spots">';
   day.spots.forEach(function(s,i){
-    var exp = st.expanded === i;
-    var vis = isVisited(st.day, i);
-    var bk = isBk(st.day, i);
-    var memo = getMemo(st.day, i);
-    var numCls = ['eat','snack'].indexOf(s.type)>=0 ? s.type : '';
-
-    spotsHtml += '<div class="scard'+(vis?' visited':'')+'" id="spot-'+i+'">' +
-      '<div class="scard-top" data-spot="'+i+'">' +
-        '<div class="scard-num '+numCls+'">'+(i+1)+'</div>' +
-        '<div class="scard-info">' +
-          '<div class="scard-name">'+s.name+' <span class="ja">'+s.ja+'</span>' +
-            ' <span class="bk-star'+(bk?' on':'')+'" data-bk="'+i+'">'+(bk?'⭐':'☆')+'</span>' +
-          '</div>' +
-          '<div class="scard-time">'+(TYPE_IC[s.type]||'📍')+' '+s.time+(s.tags?' · '+s.tags[0]:'')+'</div>' +
-          '<div class="scard-tags">'+(s.tags||[]).map(function(t){return '<span class="stag">'+t+'</span>'}).join('')+'</div>' +
-        '</div>' +
-      '</div>';
-
+    var exp=st.expanded===i, vis=isVisited(st.day,i), bk=isBk(st.day,i), memo=getMemo(st.day,i);
+    var nc=['eat','snack'].indexOf(s.type)>=0?s.type:'';
+    h+='<div class="scard'+(vis?' visited':'')+'" id="spot-'+i+'">';
+    h+='<div class="scard-top" data-spot="'+i+'">';
+    h+='<div class="scard-num '+nc+'">'+(i+1)+'</div>';
+    h+='<div class="scard-info">';
+    h+='<div class="scard-name">'+s.name+' <span class="ja">'+s.ja+'</span> <span class="bk-star'+(bk?' on':'')+'" data-bk="'+i+'">'+(bk?'⭐':'☆')+'</span></div>';
+    h+='<div class="scard-time">'+(TYPE_IC[s.type]||'📍')+' '+s.time+(s.tags?' · '+s.tags[0]:'')+'</div>';
+    h+='<div class="scard-tags">'+(s.tags||[]).map(function(t){return'<span class="stag">'+t+'</span>'}).join('')+'</div>';
+    h+='</div></div>';
     if(exp){
-      spotsHtml += '<div class="scard-detail">' + (s.note||'');
+      h+='<div class="scard-detail">'+(s.note||'');
       if(s.lat){
-        spotsHtml += '<div class="deeplink-row">' +
-          '<a class="deeplink-btn" data-gapp="'+i+'">🗺 Google Maps</a>' +
-          '<a class="deeplink-btn" data-amap="'+i+'">🍎 Apple Maps</a>' +
-          '<a class="deeplink-btn" data-transit="'+i+'">🚃 길찾기</a>' +
-        '</div>';
+        h+='<div class="deeplink-row">';
+        h+='<a class="deeplink-btn" data-gapp="'+i+'">🗺 Google Maps</a>';
+        h+='<a class="deeplink-btn" data-amap="'+i+'">🍎 Apple Maps</a>';
+        h+='<a class="deeplink-btn" data-transit="'+i+'">🚃 길찾기</a>';
+        h+='</div>';
       }
-      spotsHtml += '<div class="scard-actions">' +
-        '<button class="'+(vis?'done':'')+'" data-vis="'+i+'">'+(vis?'✓ 방문완료':'방문 체크')+'</button>' +
-      '</div>' +
-      '<div class="memo-area">' +
-        '<textarea placeholder="메모를 남겨보세요..." data-memo="'+i+'">'+memo+'</textarea>' +
-      '</div></div>';
+      h+='<div class="scard-actions"><button class="'+(vis?'done':'')+'" data-vis="'+i+'">'+(vis?'✓ 방문완료':'방문 체크')+'</button></div>';
+      h+='<div class="memo-area"><textarea placeholder="메모..." data-memo="'+i+'">'+memo+'</textarea></div>';
+      h+='</div>';
     }
-
-    spotsHtml += '</div>';
-
-    // Transit connector between spots
-    if(i < day.spots.length - 1 && day.transit && day.transit[i]){
-      var tr = day.transit[i];
-      spotsHtml += '<div class="transit-conn">' +
-        '<span class="transit-icon">'+tr.icon+'</span>' +
-        '<span class="transit-time">'+tr.mode+' '+tr.time+'</span>' +
-      '</div>';
+    h+='</div>';
+    if(i<day.spots.length-1&&day.transit&&day.transit[i]){
+      var tr=day.transit[i];
+      h+='<div class="transit-conn"><span class="transit-icon">'+tr.icon+'</span><span class="transit-time">'+tr.mode+' '+tr.time+'</span></div>';
     }
   });
-  spotsHtml += '</div>';
-
-  return '<div class="page'+(st.tab===0?' on':'')+'" id="pg-itin">'+dtabs+summary+spotsHtml+'</div>';
-}
-
-function renderMapPage(){
-  var dtabsHtml = '<div class="dtabs">'+DAYS.map(function(d,i){
-    return '<div class="dtab'+(st.day===i?' on':'')+'" data-day="'+i+'">'+d.label+'</div>';
-  }).join('')+'</div>';
-
-  if(mapLoadFailed){
-    return '<div class="page map-page'+(st.tab===1?' on':'')+'" id="pg-map">'+dtabsHtml+renderMapFallback()+'</div>';
-  }
-  return '<div class="page map-page'+(st.tab===1?' on':'')+'" id="pg-map">'+dtabsHtml+'<div id="map" style="flex:1"></div></div>';
-}
-
-function renderMapFallback(){
-  var day = DAYS[st.day];
-  var items = day.spots.map(function(s,i){
-    if(!s.lat) return '';
-    return '<div class="map-fb-item">' +
-      '<div class="name">'+(i+1)+'. '+s.name+' <span style="color:var(--dim);font-size:11px">'+s.ja+'</span></div>' +
-      '<div class="meta">'+(TYPE_IC[s.type]||'📍')+' '+s.time+' — '+(s.note||'')+'</div>' +
-      '<div class="map-fb-links">' +
-        '<a href="#" data-gapp="'+i+'">🗺 Google Maps</a>' +
-        '<a href="#" data-amap="'+i+'">🍎 Apple Maps</a>' +
-        '<a href="#" data-transit="'+i+'">🚃 길찾기</a>' +
-      '</div></div>';
-  }).join('');
-  return '<div class="map-fallback"><div class="map-fallback-title">📍 '+day.label+' — '+day.title+' (오프라인 목록)</div>'+items+'</div>';
-}
-
-function renderNearby(){
-  var chips = '<div class="nb-bar">' + NB_TYPES.map(function(t){
-    return '<div class="nb-chip'+(st.nbType===t.id?' on':'')+'" data-nb="'+t.id+'">'+t.icon+' '+t.label+'</div>';
-  }).join('') + '</div>';
-
-  var content = '';
-  if(!st.userLat){
-    content = '<div class="nb-status">현재 위치를 허용하면 주변 장소를 검색할 수 있어요.<button class="nb-gps-btn" id="gpsBtn">📍 위치 허용하기</button></div>';
-  } else if(st.nbLoading){
-    content = '<div class="loading"><div class="spinner"></div>주변 검색 중...</div>';
-  } else if(st.nbResults.length === 0){
-    content = '<div class="nb-status">검색 결과가 없어요. 다른 카테고리를 선택해보세요.</div>';
-  } else {
-    content = '<div class="nb-map-wrap"><div id="mapNb"></div></div>' +
-      '<div class="nb-list">' + st.nbResults.map(function(r){
-      var rating = r.rating ? '<span class="star">★ '+r.rating+'</span> <span>('+( r.userRatingCount||0)+')</span>' : '';
-      var open = r.currentOpeningHours?.openNow;
-      var openTxt = open===true?'<span style="color:var(--green)">영업중</span>':open===false?'<span style="color:var(--red)">영업종료</span>':'';
-      return '<div class="nb-item">' +
-        '<div class="nb-item-name">'+(r.displayName?.text||'이름없음')+'</div>' +
-        '<div class="nb-item-meta">'+rating+' '+openTxt+'</div>' +
-        '<div class="nb-item-addr">'+(r.formattedAddress||'')+'</div>' +
-        (r.googleMapsUri?'<a class="nb-item-link" href="'+r.googleMapsUri+'" target="_blank" rel="noopener">Google Maps에서 보기 →</a>':'') +
-      '</div>';
-    }).join('') + '</div>';
-  }
-
-  return '<div class="page'+(st.tab===2?' on':'')+'" id="pg-nb">'+chips+content+'</div>';
+  h+='</div>';
+  return h;
 }
 
 function renderTools(){
-  var cached = ls('rateCache');
-  var rateAge = '';
-  if(cached && cached.ts){
-    var mins = Math.floor((Date.now()-cached.ts)/60000);
-    if(mins<1) rateAge = '방금 전';
-    else if(mins<60) rateAge = mins+'분 전';
-    else if(mins<1440) rateAge = Math.floor(mins/60)+'시간 전';
-    else rateAge = Math.floor(mins/1440)+'일 전';
+  var cached=ls('rateCache'), rateAge='';
+  if(cached&&cached.ts){
+    var m=Math.floor((Date.now()-cached.ts)/60000);
+    rateAge=m<1?'방금 전':m<60?m+'분 전':m<1440?Math.floor(m/60)+'시간 전':Math.floor(m/1440)+'일 전';
   }
+  var nbChips=['restaurant','cafe','convenience_store','drugstore'];
+  var nbLabels={restaurant:'🍽️ 맛집',cafe:'☕ 카페',convenience_store:'🏪 편의점',drugstore:'💊 드럭스토어'};
 
-  return '<div class="page'+(st.tab===3?' on':'')+'" id="pg-tools"><div class="tool-section">' +
-    '<div class="tool-card"><h3>💱 환율 계산기</h3>' +
-      '<div class="tool-row">' +
-        '<input type="number" class="tool-input" id="krwInput" placeholder="원 (KRW)" inputmode="numeric">' +
-        '<span style="font-size:18px">→</span>' +
-        '<input type="number" class="tool-input" id="jpyInput" placeholder="엔 (JPY)" inputmode="numeric">' +
-      '</div>' +
-      '<div class="tool-rate" id="rateInfo">1 KRW ≈ '+exchangeRate.toFixed(4)+' JPY'+(rateAge?' · 갱신: '+rateAge:'')+'</div>' +
-    '</div>' +
+  var h='<div class="tool-section">';
+  // Exchange
+  h+='<div class="tool-card"><h3>💱 환율 계산기</h3>';
+  h+='<div class="tool-row"><input type="number" class="tool-input" id="krwInput" placeholder="원 (KRW)" inputmode="numeric"><span style="font-size:16px">→</span><input type="number" class="tool-input" id="jpyInput" placeholder="엔 (JPY)" inputmode="numeric"></div>';
+  h+='<div class="tool-rate">1 KRW ≈ '+exchangeRate.toFixed(4)+' JPY'+(rateAge?' · '+rateAge:'')+'</div></div>';
 
-    '<div class="tool-card"><h3>🚨 긴급 연락처</h3>' +
-      '<div class="emer-list">' +
-        '<div class="emer-item"><span class="name">경찰</span><a href="tel:110">110</a></div>' +
-        '<div class="emer-item"><span class="name">소방 / 구급</span><a href="tel:119">119</a></div>' +
-        '<div class="emer-item"><span class="name">주일한국대사관</span><a href="tel:+81335520401">03-3452-7611</a></div>' +
-        '<div class="emer-item"><span class="name">관광안내 (다국어)</span><a href="tel:+81570064372">050-3816-2787</a></div>' +
-      '</div>' +
-    '</div>' +
+  // Nearby
+  h+='<div class="tool-card"><h3>📍 주변 검색</h3>';
+  h+='<div class="nb-bar">'+nbChips.map(function(c){return'<div class="nb-chip'+(st.nbType===c?' on':'')+'" data-nb="'+c+'">'+nbLabels[c]+'</div>'}).join('')+'</div>';
+  if(!st.userLat) h+='<button class="nb-gps-btn" id="gpsBtn">📍 위치 허용하기</button>';
+  else if(st.nbLoading) h+='<div style="text-align:center;padding:8px;color:var(--dim);font-size:11px"><div class="spinner"></div> 검색 중...</div>';
+  else if(st.nbResults.length) h+=st.nbResults.slice(0,10).map(function(r){
+    var star=r.rating?'★'+r.rating+' ':'';
+    return'<div class="nb-item"><div class="nb-item-name">'+(r.displayName?.text||'')+'</div><div class="nb-item-meta">'+star+(r.formattedAddress||'')+'</div>'+(r.googleMapsUri?'<a class="nb-item-link" href="'+r.googleMapsUri+'" target="_blank">→ Maps에서 보기</a>':'')+'</div>';
+  }).join('');
+  else h+='<div style="text-align:center;padding:8px;color:var(--dim);font-size:11px">결과 없음</div>';
+  h+='</div>';
 
-    '<div class="tool-card"><h3>🚃 교통 팁</h3>' +
-      '<div class="transport-tip">' +
-        '<b>스카이라이너</b>: 나리타↔우에노 41분, 편도 ¥2,520<br><br>' +
-        '<b>Suica/Pasmo</b>: 편의점에서 충전. JR·메트로·버스 모두 사용 가능.<br><br>' +
-        '<b>오시아게역 노선</b>: 한조몬선(직통), 아사쿠사선, 도부 스카이트리 라인<br><br>' +
-        '<b>막차 주의</b>: 대부분 자정~0:30 막차. 야간에는 택시 이용.<br><br>' +
-        '<b>Google Maps</b>: 일본 대중교통 검색 정확도 매우 높음. 적극 활용!' +
-      '</div>' +
-    '</div>' +
+  // Emergency
+  h+='<div class="tool-card"><h3>🚨 긴급 연락처</h3><div class="emer-list">';
+  h+='<div class="emer-item"><span class="name">경찰</span><a href="tel:110">110</a></div>';
+  h+='<div class="emer-item"><span class="name">소방/구급</span><a href="tel:119">119</a></div>';
+  h+='<div class="emer-item"><span class="name">주일한국대사관</span><a href="tel:+81335520401">03-3452-7611</a></div>';
+  h+='</div></div>';
 
-    '<div class="tool-card"><h3>📶 오프라인 지도 안내</h3>' +
-      '<div class="transport-tip">' +
-        '<b>Google Maps 오프라인</b>: 앱 → 프로필 → 오프라인 지도 → 도쿄 영역 다운로드<br><br>' +
-        '<b>Apple Maps 오프라인</b>: 설정 → 지도 → 오프라인 지도 → 도쿄 추가<br><br>' +
-        '<b>추천</b>: 출발 전 WiFi에서 미리 다운로드. 지하철/실내에서도 지도 확인 가능!' +
-      '</div>' +
-    '</div>' +
+  // Transport
+  h+='<div class="tool-card"><h3>🚃 교통 팁</h3><div class="transport-tip">';
+  h+='<b>스카이라이너</b>: 나리타↔우에노 41분 ¥2,520<br>';
+  h+='<b>Suica/Pasmo</b>: 편의점 충전, JR·메트로·버스 사용<br>';
+  h+='<b>오시아게역</b>: 한조몬선, 아사쿠사선, 도부 스카이트리 라인<br>';
+  h+='<b>막차</b>: 대부분 자정~0:30. 야간은 택시';
+  h+='</div></div>';
 
-    '<div class="tool-card"><h3>📌 유용한 일본어</h3>' +
-      '<div class="info-grid">' +
-        '<div class="info-item"><div class="label">감사합니다</div><div class="value">ありがとう</div></div>' +
-        '<div class="info-item"><div class="label">실례합니다</div><div class="value">すみません</div></div>' +
-        '<div class="info-item"><div class="label">얼마예요?</div><div class="value">いくらですか</div></div>' +
-        '<div class="info-item"><div class="label">이거 주세요</div><div class="value">これください</div></div>' +
-        '<div class="info-item"><div class="label">화장실 어디?</div><div class="value">トイレはどこ</div></div>' +
-        '<div class="info-item"><div class="label">맛있어요</div><div class="value">おいしい</div></div>' +
-        '<div class="info-item"><div class="label">계산 부탁</div><div class="value">お会計お願い</div></div>' +
-        '<div class="info-item"><div class="label">도와주세요</div><div class="value">助けてください</div></div>' +
-      '</div>' +
-    '</div>' +
+  // Offline map guide
+  h+='<div class="tool-card"><h3>📶 오프라인 지도</h3><div class="transport-tip">';
+  h+='<b>Google Maps</b>: 앱 → 프로필 → 오프라인 지도 → 도쿄 다운로드<br>';
+  h+='<b>Apple Maps</b>: 설정 → 지도 → 오프라인 지도 → 도쿄 추가';
+  h+='</div></div>';
 
-    '<div class="tool-card"><h3>⭐ 북마크한 장소</h3>' +
-      '<div id="bkList" style="font-size:12px;color:var(--sub)">북마크한 장소가 없어요</div>' +
-    '</div>' +
-  '</div></div>';
+  // Japanese
+  h+='<div class="tool-card"><h3>📌 유용한 일본어</h3><div class="info-grid">';
+  [['감사합니다','ありがとう'],['실례합니다','すみません'],['얼마예요?','いくらですか'],['이거 주세요','これください'],['화장실 어디?','トイレはどこ'],['맛있어요','おいしい'],['계산 부탁','お会計お願い'],['도와주세요','助けてください']].forEach(function(p){
+    h+='<div class="info-item"><div class="label">'+p[0]+'</div><div class="value">'+p[1]+'</div></div>';
+  });
+  h+='</div></div>';
+
+  // Bookmarks
+  h+='<div class="tool-card"><h3>⭐ 북마크</h3><div id="bkList" style="font-size:11px;color:var(--sub)">';
+  var bks=ls('bk')||{};
+  var bkItems=Object.keys(bks).filter(function(k){return bks[k]}).map(function(k){
+    var p=k.split('-').map(Number);var spot=DAYS[p[0]]&&DAYS[p[0]].spots[p[1]];
+    return spot?'<div style="padding:4px 0;border-bottom:1px solid var(--border)">'+DAYS[p[0]].label+' · '+spot.name+'</div>':'';
+  }).filter(Boolean);
+  h+=bkItems.length?bkItems.join(''):'북마크 없음';
+  h+='</div></div>';
+
+  h+='</div>';
+  return h;
 }
 
-// === EVENTS ===
-function bindEvents(){
+function renderBottomTab(){
+  document.getElementById('btab').innerHTML =
+    '<button class="btab-item'+(st.tab===0?' on':'')+'" data-tab="0">📋 일정</button>'+
+    '<button class="btab-item'+(st.tab===1?' on':'')+'" data-tab="1">🔧 도구</button>';
   document.querySelectorAll('.btab-item').forEach(function(el){
-    el.onclick = function(){ st.tab = +el.dataset.tab; render(); };
+    el.onclick=function(){st.tab=+el.dataset.tab;render()};
   });
-  document.querySelectorAll('.dtab').forEach(function(el){
-    el.onclick = function(){ st.day = +el.dataset.day; st.expanded = null; render(); };
-  });
+}
+
+function updateMapVisibility(){
+  var wrap=document.getElementById('mapWrap');
+  if(st.tab===0){
+    wrap.style.display='';
+    if(mapReady&&map) google.maps.event.trigger(map,'resize');
+  } else {
+    wrap.style.display='none';
+  }
+}
+
+function bindContentEvents(){
+  // Spot expand
   document.querySelectorAll('.scard-top').forEach(function(el){
-    el.onclick = function(e){
-      if(e.target.classList.contains('bk-star')) return;
-      var i = +el.dataset.spot;
-      st.expanded = st.expanded===i ? null : i;
+    el.onclick=function(e){
+      if(e.target.classList.contains('bk-star'))return;
+      var i=+el.dataset.spot;
+      st.expanded=st.expanded===i?null:i;
       render();
-      if(st.expanded!==null) setTimeout(function(){
-        var card = document.getElementById('spot-'+i);
-        if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
-      },50);
+      if(st.expanded!==null){
+        setTimeout(function(){
+          var c=document.getElementById('spot-'+i);
+          if(c)c.scrollIntoView({behavior:'smooth',block:'center'});
+          if(mapReady&&map){
+            var s=DAYS[st.day].spots[i];
+            if(s.lat)map.panTo({lat:s.lat,lng:s.lng});
+          }
+        },50);
+      }
     };
   });
+  // Bookmark
   document.querySelectorAll('.bk-star').forEach(function(el){
-    el.onclick = function(e){ e.stopPropagation(); toggleBk(st.day, +el.dataset.bk); };
+    el.onclick=function(e){e.stopPropagation();toggleBk(st.day,+el.dataset.bk)};
   });
+  // Visit
   document.querySelectorAll('[data-vis]').forEach(function(el){
-    el.onclick = function(){ toggleVisited(st.day, +el.dataset.vis); };
+    el.onclick=function(){toggleVisited(st.day,+el.dataset.vis)};
   });
-  // Deep links: Google Maps App
+  // Deep links
   document.querySelectorAll('[data-gapp]').forEach(function(el){
-    el.onclick = function(e){
-      e.preventDefault();
-      var s = DAYS[st.day].spots[+el.dataset.gapp];
-      if(s.lat) openGoogleMapsApp(s.lat,s.lng,s.name);
-    };
+    el.onclick=function(e){e.preventDefault();var s=DAYS[st.day].spots[+el.dataset.gapp];if(s.lat)openGMap(s.lat,s.lng,s.name)};
   });
-  // Deep links: Apple Maps
   document.querySelectorAll('[data-amap]').forEach(function(el){
-    el.onclick = function(e){
-      e.preventDefault();
-      var s = DAYS[st.day].spots[+el.dataset.amap];
-      if(s.lat) openAppleMaps(s.lat,s.lng,s.name);
-    };
+    el.onclick=function(e){e.preventDefault();var s=DAYS[st.day].spots[+el.dataset.amap];if(s.lat)openAMap(s.lat,s.lng,s.name)};
   });
-  // Deep links: Transit
   document.querySelectorAll('[data-transit]').forEach(function(el){
-    el.onclick = function(e){
-      e.preventDefault();
-      var s = DAYS[st.day].spots[+el.dataset.transit];
-      if(s.lat) openTransitDirections(s.lat,s.lng);
-    };
+    el.onclick=function(e){e.preventDefault();var s=DAYS[st.day].spots[+el.dataset.transit];if(s.lat)openTransit(s.lat,s.lng)};
   });
-  // Memo save
+  // Memo
   document.querySelectorAll('[data-memo]').forEach(function(el){
-    el.oninput = function(){ setMemo(st.day, +el.dataset.memo, el.value); };
-  });
-  // GPS button
-  var gpsBtn = document.getElementById('gpsBtn');
-  if(gpsBtn) gpsBtn.onclick = requestGPS;
-  // Nearby chips
-  document.querySelectorAll('.nb-chip').forEach(function(el){
-    el.onclick = function(){ st.nbType = el.dataset.nb; if(st.userLat) searchNearby(); render(); };
+    el.oninput=function(){setMemo(st.day,+el.dataset.memo,el.value)};
   });
   // Currency
-  var krwIn = document.getElementById('krwInput');
-  var jpyIn = document.getElementById('jpyInput');
-  if(krwIn) krwIn.oninput = function(){ jpyIn.value = krwIn.value ? Math.round(krwIn.value * exchangeRate) : ''; };
-  if(jpyIn) jpyIn.oninput = function(){ krwIn.value = jpyIn.value ? Math.round(jpyIn.value / exchangeRate) : ''; };
-
-  // Bookmarks list
-  var bkList = document.getElementById('bkList');
-  if(bkList){
-    var bks = ls('bk')||{};
-    var items = Object.keys(bks).filter(function(k){return bks[k]}).map(function(k){
-      var parts = k.split('-').map(Number);
-      var spot = DAYS[parts[0]]?.spots[parts[1]];
-      if(!spot) return '';
-      return '<div style="padding:6px 0;border-bottom:1px solid var(--border)">'+DAYS[parts[0]].label+' · '+spot.name+' <span style="color:var(--dim)">'+spot.ja+'</span></div>';
-    }).filter(Boolean);
-    bkList.innerHTML = items.length ? items.join('') : '북마크한 장소가 없어요';
-  }
+  var ki=document.getElementById('krwInput'),ji=document.getElementById('jpyInput');
+  if(ki)ki.oninput=function(){ji.value=ki.value?Math.round(ki.value*exchangeRate):''};
+  if(ji)ji.oninput=function(){ki.value=ji.value?Math.round(ji.value/exchangeRate):''};
+  // GPS
+  var gb=document.getElementById('gpsBtn');
+  if(gb)gb.onclick=requestGPS;
+  // Nearby chips
+  document.querySelectorAll('.nb-chip').forEach(function(el){
+    el.onclick=function(){st.nbType=el.dataset.nb;if(st.userLat)searchNearby();else render()};
+  });
 }
 
-// === GOOGLE MAPS ===
-var mapReady = false;
+// === MAP (stable, never destroyed) ===
 function initMap(){
-  mapReady = true;
-  clearTimeout(mapLoadTimer);
-  initMapIfNeeded();
+  mapReady=true;
+  document.getElementById('mapLoading').classList.add('hide');
+  map=new google.maps.Map(document.getElementById('map'),{
+    center:{lat:HOTEL.lat,lng:HOTEL.lng},zoom:13,
+    mapTypeControl:false,fullscreenControl:false,streetViewControl:false,zoomControl:true,
+    styles:[
+      {featureType:'poi.business',stylers:[{visibility:'off'}]},
+      {featureType:'transit',elementType:'labels.icon',stylers:[{visibility:'off'}]}
+    ]
+  });
+  updateMapMarkers();
   render();
   fetchEnvData();
 }
 
-function initMapIfNeeded(){
-  if(!mapReady) return;
-
-  if(st.tab === 0 || st.tab === 1){
-    var el = document.getElementById('map');
-    if(!el) return;
-    if(!map){
-      map = new google.maps.Map(el, {
-        center:{lat:HOTEL.lat,lng:HOTEL.lng}, zoom:13,
-        mapTypeControl:false, fullscreenControl:false, streetViewControl:false,
-        zoomControl:true,
-        styles:[
-          {featureType:'poi.business',stylers:[{visibility:'off'}]},
-          {featureType:'transit',elementType:'labels.icon',stylers:[{visibility:'off'}]}
-        ]
-      });
-    }
-    updateMapMarkers();
-  }
-
-  if(st.tab === 2 && st.userLat && st.nbResults.length){
-    setTimeout(function(){
-      var el = document.getElementById('mapNb');
-      if(!el || mapNb) return;
-      mapNb = new google.maps.Map(el, {
-        center:{lat:st.userLat,lng:st.userLng}, zoom:15,
-        mapTypeControl:false, fullscreenControl:false, streetViewControl:false, zoomControl:false,
-        styles:[{featureType:'poi.business',stylers:[{visibility:'off'}]}]
-      });
-      new google.maps.Marker({position:{lat:st.userLat,lng:st.userLng},map:mapNb,
-        icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:'#4285f4',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
-      });
-      st.nbResults.forEach(function(r,i){
-        var loc = r.location;
-        if(!loc) return;
-        var m = new google.maps.Marker({position:{lat:loc.latitude,lng:loc.longitude},map:mapNb,
-          label:{text:String(i+1),fontSize:'10px',color:'#fff'},
-          icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:'#1a1a1a',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
-        });
-        var info = new google.maps.InfoWindow({
-          content:'<div style="font-size:12px;font-family:sans-serif"><b>'+(r.displayName?.text||'')+'</b><br>★ '+(r.rating||'-')+'</div>'
-        });
-        m.addListener('click',function(){info.open(mapNb,m)});
-      });
-    },100);
-  }
-}
-
 function updateMapMarkers(){
-  if(!map) return;
+  if(!map)return;
   markers.forEach(function(m){m.setMap(null)});
-  markers = [];
-  if(polyline) polyline.setMap(null);
-
-  var day = DAYS[st.day];
-  var bounds = new google.maps.LatLngBounds();
-  var pts = [];
-
+  markers=[];
+  if(polyline)polyline.setMap(null);
+  var day=DAYS[st.day],bounds=new google.maps.LatLngBounds(),pts=[];
   day.spots.forEach(function(s,i){
-    if(!s.lat) return;
-    var colors = {eat:'#b8860b',snack:'#aaa',shop:'#888',spot:'#1a1a1a',transport:'#ccc',hotel:'#555'};
-    var c = colors[s.type]||'#999';
-    var m = new google.maps.Marker({
-      position:{lat:s.lat,lng:s.lng}, map:map,
-      icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:c,fillOpacity:1,strokeColor:'#fff',strokeWeight:2},
-      label:{text:String(i+1),fontSize:'10px',color:'#fff',fontWeight:'bold'},
+    if(!s.lat)return;
+    var colors={eat:'#b8860b',snack:'#aaa',shop:'#888',spot:'#1a1a1a',transport:'#ccc',hotel:'#555'};
+    var m=new google.maps.Marker({
+      position:{lat:s.lat,lng:s.lng},map:map,
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:10,fillColor:colors[s.type]||'#999',fillOpacity:1,strokeColor:'#fff',strokeWeight:2},
+      label:{text:String(i+1),fontSize:'9px',color:'#fff',fontWeight:'bold'},
       title:s.name
     });
-    var info = new google.maps.InfoWindow({
-      content:'<div style="font-family:sans-serif;font-size:12px;max-width:200px"><b>'+s.name+'</b><br><span style="color:#999;font-size:10px">'+(s.ja||'')+'</span><br><span style="font-size:10px;color:#666">'+(s.note||'')+'</span></div>'
+    m.addListener('click',function(){
+      st.expanded=i;render();
+      setTimeout(function(){var c=document.getElementById('spot-'+i);if(c)c.scrollIntoView({behavior:'smooth',block:'center'})},50);
     });
-    m.addListener('click',function(){info.open(map,m)});
     markers.push(m);
     bounds.extend({lat:s.lat,lng:s.lng});
     pts.push({lat:s.lat,lng:s.lng});
   });
-
-  if(pts.length > 1){
-    polyline = new google.maps.Polyline({path:pts,geodesic:true,strokeColor:'#ccc',strokeWeight:1.5,strokeOpacity:.7,map:map});
-  }
-
-  if(pts.length) map.fitBounds(bounds,{top:60,bottom:80,left:40,right:40});
+  if(pts.length>1) polyline=new google.maps.Polyline({path:pts,geodesic:true,strokeColor:'#ccc',strokeWeight:1.5,strokeOpacity:.7,map:map});
+  if(pts.length) map.fitBounds(bounds,{top:20,bottom:20,left:30,right:30});
 }
 
-// === MAP LOAD TIMEOUT ===
-var mapLoadTimer = setTimeout(function(){
+// Map load timeout
+setTimeout(function(){
   if(!mapReady){
-    mapLoadFailed = true;
-    render();
+    var ml=document.getElementById('mapLoading');
+    if(ml)ml.innerHTML='지도 로드 실패 — 스팟 목록의 딥링크를 사용하세요';
   }
-},10000);
+},12000);
 
-// === NEARBY SEARCH (Places API) ===
+// Nearby
 function requestGPS(){
-  if(!navigator.geolocation){alert('GPS를 지원하지 않는 브라우저예요.');return;}
+  if(!navigator.geolocation)return;
   navigator.geolocation.getCurrentPosition(
-    function(pos){ st.userLat=pos.coords.latitude; st.userLng=pos.coords.longitude; searchNearby(); },
-    function(){ alert('위치 권한을 허용해주세요.'); },
+    function(p){st.userLat=p.coords.latitude;st.userLng=p.coords.longitude;searchNearby()},
+    function(){},
     {enableHighAccuracy:true,timeout:10000}
   );
 }
-
 async function searchNearby(){
-  st.nbLoading = true;
-  st.nbResults = [];
-  mapNb = null;
-  render();
-
-  var typeInfo = NB_TYPES.find(function(t){return t.id===st.nbType});
+  st.nbLoading=true;st.nbResults=[];render();
+  var types={restaurant:'restaurant',cafe:'cafe',convenience_store:'convenience_store',drugstore:'drugstore'};
   try{
-    var res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+    var r=await fetch('https://places.googleapis.com/v1/places:searchNearby',{
       method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-Goog-Api-Key':API_KEY,
-        'X-Goog-FieldMask':'places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.location,places.currentOpeningHours,places.googleMapsUri,places.primaryTypeDisplayName'
-      },
-      body:JSON.stringify({
-        includedTypes:[typeInfo.google],
-        maxResultCount:15,
-        locationRestriction:{circle:{center:{latitude:st.userLat,longitude:st.userLng},radius:800}}
-      })
+      headers:{'Content-Type':'application/json','X-Goog-Api-Key':API_KEY,'X-Goog-FieldMask':'places.displayName,places.rating,places.formattedAddress,places.googleMapsUri'},
+      body:JSON.stringify({includedTypes:[types[st.nbType]||'restaurant'],maxResultCount:10,locationRestriction:{circle:{center:{latitude:st.userLat,longitude:st.userLng},radius:800}}})
     });
-    var data = await res.json();
-    st.nbResults = (data.places||[]).sort(function(a,b){return (b.rating||0)-(a.rating||0)});
-  }catch(e){ console.error(e); }
-
-  st.nbLoading = false;
-  render();
+    var d=await r.json();
+    st.nbResults=(d.places||[]).sort(function(a,b){return(b.rating||0)-(a.rating||0)});
+  }catch(e){}
+  st.nbLoading=false;render();
 }
 
-// === ENV DATA ===
+// Env data
 async function fetchEnvData(){
-  var lat = HOTEL.lat, lng = HOTEL.lng;
   try{
-    var r = await fetch('https://weather.googleapis.com/v1/currentConditions:lookup?key='+API_KEY+'&location.latitude='+lat+'&location.longitude='+lng+'&languageCode=ko');
-    weatherData = await r.json();
+    var r=await fetch('https://weather.googleapis.com/v1/currentConditions:lookup?key='+API_KEY+'&location.latitude='+HOTEL.lat+'&location.longitude='+HOTEL.lng+'&languageCode=ko');
+    weatherData=await r.json();
   }catch(e){}
   try{
-    var r2 = await fetch('https://airquality.googleapis.com/v1/currentConditions:lookup?key='+API_KEY,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({location:{latitude:lat,longitude:lng},extraComputations:['POLLUTANT_CONCENTRATION']})
+    var r2=await fetch('https://airquality.googleapis.com/v1/currentConditions:lookup?key='+API_KEY,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({location:{latitude:HOTEL.lat,longitude:HOTEL.lng},extraComputations:['POLLUTANT_CONCENTRATION']})
     });
-    aqiData = await r2.json();
+    aqiData=await r2.json();
   }catch(e){}
-  render();
+  updateEnvPills();
+}
+function updateEnvPills(){
+  var pills=[];
+  if(weatherData){
+    var t=weatherData.temperature?.degrees;
+    if(t!==undefined)pills.push('<div class="pill">🌡 <b>'+Math.round(t)+'°</b></div>');
+  }
+  if(aqiData){
+    var idx=aqiData.indexes?.[0];var aqi=idx?.aqi;
+    if(aqi){var cls=aqi<=50?'good':aqi<=100?'mod':'bad';var lbl=aqi<=50?'좋음':aqi<=100?'보통':'나쁨';
+      pills.push('<div class="pill '+cls+'">AQI <b>'+aqi+'</b></div>');
+    }
+  }
+  if(pills.length) document.getElementById('envPills').innerHTML=pills.join('');
 }
 
-// === EXCHANGE RATE (with offline caching) ===
-var exchangeRate = 0.1085;
-(function loadCachedRate(){
-  var cached = ls('rateCache');
-  if(cached && cached.rate) exchangeRate = cached.rate;
-})();
-
+// Exchange rate
 async function fetchRate(){
   try{
-    var r = await fetch('https://open.er-api.com/v6/latest/KRW');
-    var d = await r.json();
-    if(d.rates && d.rates.JPY){
-      exchangeRate = d.rates.JPY;
-      ls('rateCache',{rate:exchangeRate,ts:Date.now()});
-    }
-  }catch(e){
-    // offline: use cached rate
-  }
+    var r=await fetch('https://open.er-api.com/v6/latest/KRW');var d=await r.json();
+    if(d.rates&&d.rates.JPY){exchangeRate=d.rates.JPY;ls('rateCache',{rate:exchangeRate,ts:Date.now()})}
+  }catch(e){}
 }
 
-// === OFFLINE INDICATOR ===
-function updateOfflineBanner(){
-  var banner = document.getElementById('offlineBanner');
-  if(banner){
-    if(navigator.onLine) banner.classList.remove('show');
-    else banner.classList.add('show');
-  }
+// Offline
+function updateOffline(){
+  var b=document.getElementById('offlineBanner');
+  if(b){if(navigator.onLine)b.classList.remove('show');else b.classList.add('show')}
 }
-window.addEventListener('online',function(){ updateOfflineBanner(); fetchRate(); });
-window.addEventListener('offline',updateOfflineBanner);
+window.addEventListener('online',function(){updateOffline();fetchRate()});
+window.addEventListener('offline',updateOffline);
 
-// === SERVICE WORKER ===
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/tokyo-pwa/sw.js').catch(function(){});
-}
+// SW
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/tokyo-pwa/sw.js').catch(function(){});
 
-// === INIT ===
+// Init
 fetchRate();
-updateOfflineBanner();
-
-// Initial render before Google Maps loads
-document.getElementById('app').innerHTML = '<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills"><div class="pill">로딩...</div></div></div><div class="content"><div class="page on" style="display:flex;align-items:center;justify-content:center;height:100%;padding-bottom:72px"><div class="loading"><div class="spinner"></div>지도 로딩 중...</div></div></div><div class="btab"><button class="btab-item on"><span class="ico">📋</span>일정</button><button class="btab-item"><span class="ico">🗺️</span>지도</button><button class="btab-item"><span class="ico">📍</span>주변</button><button class="btab-item"><span class="ico">🔧</span>도구</button></div>';
+updateOffline();
+render();
 </script>
 <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNOf3Kz4ehJzLJ8D20WWoaI8qYu3dcI0s&loading=async&callback=initMap"></script>
 </body>
