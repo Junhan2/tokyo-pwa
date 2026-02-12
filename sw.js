@@ -1,5 +1,5 @@
-const CACHE_NAME = 'tokyo-2026-v2';
-const OFFLINE_URLS = ['/'];
+const CACHE_NAME = 'tokyo-2026-v3';
+const OFFLINE_URLS = ['/tokyo-pwa/', '/tokyo-pwa/index.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(

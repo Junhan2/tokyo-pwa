@@ -2,7 +2,7 @@
   "name": "Tokyo 2026",
   "short_name": "Tokyo",
   "description": "도쿄 여행 가이드 2026.2.13-17",
-  "start_url": "/",
+  "start_url": "/tokyo-pwa/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1a1a1a",

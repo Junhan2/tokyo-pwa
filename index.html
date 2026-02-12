@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tokyo 2026">
 <meta name="theme-color" content="#1a1a1a">
-<link rel="manifest" href="/manifest.json">
+<link rel="manifest" href="/tokyo-pwa/manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a1a1a'/><text y='68' x='50' text-anchor='middle' font-size='50' fill='white'>🗼</text></svg>">
 <title>Tokyo 2026</title>
 <style>
@@ -642,7 +642,7 @@ async function fetchRate(){
 
 // === SERVICE WORKER ===
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  navigator.serviceWorker.register('/tokyo-pwa/sw.js').catch(()=>{});
 }
 
 // === INIT ===
