@@ -334,12 +334,15 @@ function openTransitDirections(lat,lng){
 
 // === RENDER ===
 function render(){
+  // Reset map references since innerHTML destroys DOM nodes
+  map = null; mapNb = null;
   const app = document.getElementById('app');
   app.innerHTML = renderHeader() + '<div class="content">' +
     renderItinerary() + renderMapPage() + renderNearby() + renderTools() +
     '</div>' + renderBottomTab();
   bindEvents();
-  if(st.tab === 0 || st.tab === 1) initMapIfNeeded();
+  if(st.tab === 1) initMapIfNeeded();
+  if(st.tab === 2 && st.userLat && st.nbResults.length) initMapIfNeeded();
 }
 
 function renderHeader(){
