@@ -16,6 +16,10 @@
 body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-font-smoothing:antialiased}
 .app{display:flex;flex-direction:column;height:100dvh}
 
+/* Offline Banner */
+.offline-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff6b35;color:#fff;text-align:center;padding:4px 16px;font-size:12px;font-weight:600;transform:translateY(-100%);transition:transform .3s ease;padding-top:calc(env(safe-area-inset-top,4px) + 4px)}
+.offline-banner.show{transform:translateY(0)}
+
 /* Header */
 .hdr{background:var(--card);padding:12px 16px;padding-top:calc(env(safe-area-inset-top,12px) + 8px);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .hdr-left h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
@@ -40,12 +44,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;back
 /* Day Tabs */
 .dtabs{display:flex;gap:6px;padding:12px 16px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
 .dtabs::-webkit-scrollbar{display:none}
-.dtab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--dim);transition:all .15s;white-space:nowrap}
+.dtab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--dim);transition:all .15s;white-space:nowrap;position:relative}
 .dtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.dtab .today-dot{width:6px;height:6px;border-radius:50%;background:var(--green);position:absolute;top:4px;right:4px}
+.dtab.on .today-dot{background:#fff}
 
 /* Spot Cards */
 .spots{padding:0 16px 16px}
-.scard{background:var(--card);border-radius:var(--r);margin-bottom:10px;border:1px solid var(--border);overflow:hidden;transition:border-color .15s}
+.scard{background:var(--card);border-radius:var(--r);margin-bottom:0;border:1px solid var(--border);overflow:hidden;transition:border-color .15s}
 .scard.visited{opacity:.65}
 .scard-top{padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
 .scard-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
@@ -67,8 +73,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;back
 .memo-area{margin-top:8px}
 .memo-area textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:60px;outline:none}
 
+/* Deep link buttons */
+.deeplink-row{display:flex;gap:6px;margin-top:8px}
+.deeplink-btn{flex:1;padding:8px 6px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;color:var(--text);display:flex;align-items:center;justify-content:center;gap:4px;transition:background .15s}
+.deeplink-btn:active{background:var(--tag)}
+
+/* Transit Connectors */
+.transit-conn{display:flex;align-items:center;gap:8px;padding:6px 16px 6px 30px;color:var(--dim);font-size:11px;position:relative}
+.transit-conn::before{content:'';position:absolute;left:29px;top:0;bottom:0;width:1px;border-left:2px dashed var(--border)}
+.transit-icon{font-size:14px;z-index:1;background:var(--bg);padding:2px 0}
+.transit-time{color:var(--sub);font-weight:500}
+
 /* Map */
 #map{width:100%;height:100%}
+
+/* Map Fallback */
+.map-fallback{padding:16px;overflow-y:auto;height:100%}
+.map-fallback-title{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--sub)}
+.map-fb-item{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;margin-bottom:8px}
+.map-fb-item .name{font-size:13px;font-weight:600}
+.map-fb-item .meta{font-size:11px;color:var(--sub);margin-top:2px}
+.map-fb-links{display:flex;gap:6px;margin-top:8px}
+.map-fb-links a{font-size:11px;color:var(--accent);text-decoration:none;font-weight:500}
 
 /* Nearby / Discover */
 .nb-bar{padding:12px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
@@ -123,6 +149,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;back
 </style>
 </head>
 <body>
+<!-- Offline Banner (outside #app) -->
+<div class="offline-banner" id="offlineBanner">📡 오프라인 모드 — 캐시된 데이터 사용 중</div>
+
 <div id="app" class="app"></div>
 
 <script>
@@ -133,8 +162,16 @@ const HOTEL = { lat: 35.7102, lng: 139.8116, name: 'Richmond Hotel Tokyo Skhole'
 // === DATA: 5-Day Itinerary ===
 const DAYS = [
   {
-    date:'2/13 (목)', label:'Day 1', title:'도착 · 아사쿠사',
+    date:'2/13 (목)', label:'Day 1', title:'도착 · 아사쿠사', isoDate:'2026-02-13',
     summary:'나리타 도착 → 스카이라이너로 우에노 → 오시아게 호텔 체크인 후 아사쿠사 산책. 센소지와 나카미세도리를 천천히 둘러보고 저녁은 현지 이자카야에서.',
+    transit:[
+      {icon:'🚄',mode:'스카이라이너+전철',time:'70분'},
+      {icon:'🚶',mode:'도보',time:'3분'},
+      {icon:'🚶',mode:'도보',time:'15분'},
+      {icon:'🚶',mode:'도보',time:'3분'},
+      {icon:'🚶',mode:'도보',time:'2분'},
+      {icon:'🚶',mode:'도보',time:'10분'}
+    ],
     spots:[
       {name:'나리타공항 도착',ja:'成田空港',time:'14:00',type:'transport',lat:35.7647,lng:140.3864,note:'스카이라이너 → 우에노 (41분) → 호텔 체크인',tags:['도착','스카이라이너']},
       {name:'Richmond Hotel',ja:'リッチモンドホテル東京スコーレ',time:'15:30',type:'hotel',lat:35.7102,lng:139.8116,note:'오시아게역 도보 3분. 스카이트리 뷰.',tags:['숙소','체크인']},
@@ -146,8 +183,17 @@ const DAYS = [
     ]
   },
   {
-    date:'2/14 (금)', label:'Day 2', title:'🗻 후지산 투어',
+    date:'2/14 (금)', label:'Day 2', title:'후지산 투어', isoDate:'2026-02-14',
     summary:'마이리얼트립 한국어 가이드 후지산 1일 투어. 도쿄역 7:45 집합, 8:00 출발. 혼마치 거리 → 아라쿠라야마 센겐 공원 → 오시노 핫카이 → 가와구치코. 저녁은 오시아게 복귀 후.',
+    transit:[
+      {icon:'🚇',mode:'한조몬선→오테마치',time:'20분'},
+      {icon:'🚌',mode:'투어버스',time:'120분'},
+      {icon:'🚌',mode:'투어버스',time:'30분'},
+      {icon:'🚌',mode:'투어버스',time:'40분'},
+      {icon:'🚌',mode:'투어버스',time:'30분'},
+      {icon:'🚌',mode:'투어버스',time:'150분'},
+      {icon:'🚶',mode:'도보',time:'5분'}
+    ],
     spots:[
       {name:'도쿄역 집합',ja:'東京駅 丸の内南口',time:'07:45',type:'transport',lat:35.6812,lng:139.7671,note:'마루노우치 남쪽 출구 → 신마루노우치 빌딩 BEAMS 간판 아래 1층. 오시아게에서 한조몬선→오테마치 약 20분.',tags:['집합','마이리얼트립']},
       {name:'혼마치 거리',ja:'本町通り',time:'10:00',type:'spot',lat:35.4875,lng:138.8031,note:'후지요시다 레트로 쇼핑 스트리트. 후지산 배경 포토스팟.',tags:['투어','포토스팟']},
@@ -159,8 +205,17 @@ const DAYS = [
     ]
   },
   {
-    date:'2/15 (토)', label:'Day 3', title:'츠키지 · 긴자 · 시부야',
+    date:'2/15 (토)', label:'Day 3', title:'츠키지 · 긴자 · 시부야', isoDate:'2026-02-15',
     summary:'아침은 츠키지 시장에서 해산물 먹방. 긴자에서 쇼핑 후 시부야로 이동. 하치코 → 시부야 스크램블 → 시부야 스카이 전망대.',
+    transit:[
+      {icon:'🚇',mode:'전철',time:'30분'},
+      {icon:'🚶',mode:'도보',time:'15분'},
+      {icon:'🚶',mode:'도보',time:'5분'},
+      {icon:'🚇',mode:'전철',time:'20분'},
+      {icon:'🚶',mode:'도보',time:'1분'},
+      {icon:'🚶',mode:'도보',time:'3분'},
+      {icon:'🚶',mode:'도보',time:'5분'}
+    ],
     spots:[
       {name:'츠키지 시장',ja:'築地場外市場',time:'09:00',type:'eat',lat:35.6654,lng:139.7707,note:'타마고야키, 해산물 덮밥, 스시 등. 아침 겸 점심으로 먹방.',tags:['아침','시장','먹방']},
       {name:'긴자 산책',ja:'銀座',time:'11:30',type:'shop',lat:35.6722,lng:139.7649,note:'유니클로 긴자점, 무인양품, 이토야 문구 등.',tags:['쇼핑','거리']},
@@ -172,8 +227,18 @@ const DAYS = [
     ]
   },
   {
-    date:'2/16 (일)', label:'Day 4', title:'하라주쿠 · 신주쿠',
+    date:'2/16 (일)', label:'Day 4', title:'하라주쿠 · 신주쿠', isoDate:'2026-02-16',
     summary:'하라주쿠에서 다케시타도리, 오모테산도 거리 산책. 메이지진구 참배 후 신주쿠로 이동. 가부키초 타워, 골든가이 탐방.',
+    transit:[
+      {icon:'🚇',mode:'전철',time:'35분'},
+      {icon:'🚶',mode:'도보',time:'10분'},
+      {icon:'🚶',mode:'도보',time:'1분'},
+      {icon:'🚶',mode:'도보',time:'10분'},
+      {icon:'🚶',mode:'도보',time:'5분'},
+      {icon:'🚇',mode:'전철',time:'15분'},
+      {icon:'🚶',mode:'도보',time:'3분'},
+      {icon:'🚶',mode:'도보',time:'5분'}
+    ],
     spots:[
       {name:'메이지진구',ja:'明治神宮',time:'09:30',type:'spot',lat:35.6764,lng:139.6993,note:'도심 속 거대한 숲. 아침에 방문하면 한적하고 경건.',tags:['신사','필수','아침추천']},
       {name:'다케시타도리',ja:'竹下通り',time:'11:00',type:'shop',lat:35.6702,lng:139.7025,note:'하라주쿠의 상징. 크레이프, 솜사탕, 개성 넘치는 가게들.',tags:['쇼핑','거리']},
@@ -186,8 +251,14 @@ const DAYS = [
     ]
   },
   {
-    date:'2/17 (월)', label:'Day 5', title:'마지막 쇼핑 · 출발',
+    date:'2/17 (월)', label:'Day 5', title:'마지막 쇼핑 · 출발', isoDate:'2026-02-17',
     summary:'오전에 아키하바라 또는 우에노에서 마지막 쇼핑. 오후 나리타 공항으로 이동.',
+    transit:[
+      {icon:'🚇',mode:'전철',time:'20분'},
+      {icon:'🚇',mode:'전철',time:'5분'},
+      {icon:'🚶',mode:'도보',time:'5분'},
+      {icon:'🚄',mode:'스카이라이너',time:'41분'}
+    ],
     spots:[
       {name:'호텔 체크아웃',ja:'',time:'10:00',type:'hotel',lat:35.7102,lng:139.8116,note:'짐은 프론트에 맡기고 가볍게 이동.',tags:['체크아웃']},
       {name:'아키하바라',ja:'秋葉原',time:'10:30',type:'shop',lat:35.6984,lng:139.7731,note:'전자제품, 피규어, 면세 쇼핑. 요도바시 카메라 추천.',tags:['쇼핑','전자제품']},
@@ -210,7 +281,7 @@ const NB_TYPES = [
 
 // === STATE ===
 let st = {
-  tab: 0,        // 0=일정, 1=지도, 2=주변, 3=도구
+  tab: 0,
   day: 0,
   expanded: null,
   nbType: 'restaurant',
@@ -221,6 +292,17 @@ let st = {
 };
 let map = null, mapNb = null, markers = [], markersNb = [], polyline = null;
 let weatherData = null, aqiData = null;
+let mapLoadFailed = false;
+
+// === AUTO-DAY DETECTION (JST) ===
+function detectTodayIndex(){
+  const jstDate = new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Tokyo'});
+  return DAYS.findIndex(d=>d.isoDate===jstDate);
+}
+(function autoSelectDay(){
+  const idx = detectTodayIndex();
+  if(idx>=0) st.day = idx;
+})();
 
 // === STORAGE ===
 function ls(k,v){
@@ -233,6 +315,22 @@ function isBk(d,s){return !!(ls('bk')||{})[d+'-'+s]}
 function toggleBk(d,s){const v=ls('bk')||{};const k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('bk',v);render()}
 function getMemo(d,s){return (ls('memos')||{})[d+'-'+s]||''}
 function setMemo(d,s,txt){const m=ls('memos')||{};m[d+'-'+s]=txt;if(!txt)delete m[d+'-'+s];ls('memos',m)}
+
+// === DEEP LINK HELPERS ===
+function openGoogleMapsApp(lat,lng,name){
+  const encoded = encodeURIComponent(name);
+  const appUrl = 'comgooglemaps://?q='+lat+','+lng+'&label='+encoded;
+  const webUrl = 'https://www.google.com/maps/search/?api=1&query='+lat+','+lng;
+  window.location = appUrl;
+  setTimeout(function(){ window.open(webUrl,'_blank'); },500);
+}
+function openAppleMaps(lat,lng,name){
+  const encoded = encodeURIComponent(name);
+  window.location = 'maps://?q='+encoded+'&ll='+lat+','+lng;
+}
+function openTransitDirections(lat,lng){
+  window.open('https://www.google.com/maps/dir/?api=1&destination='+lat+','+lng+'&travelmode=transit','_blank');
+}
 
 // === RENDER ===
 function render(){
@@ -251,235 +349,302 @@ function renderHeader(){
     if(weatherData){
       const t = weatherData.temperature?.degrees;
       const h = weatherData.humidity?.percent;
-      if(t!==undefined) pills.push(`<div class="pill">🌡 <b>${Math.round(t)}°</b></div>`);
-      if(h!==undefined) pills.push(`<div class="pill">💧 <b>${h}%</b></div>`);
+      if(t!==undefined) pills.push('<div class="pill">🌡 <b>'+Math.round(t)+'°</b></div>');
+      if(h!==undefined) pills.push('<div class="pill">💧 <b>'+h+'%</b></div>');
     }
     if(aqiData){
       const idx = aqiData.indexes?.[0];
       const aqi = idx?.aqi;
-      const pm25 = aqiData.pollutants?.find(p=>p.code==='pm25');
+      const pm25 = aqiData.pollutants?.find(function(p){return p.code==='pm25'});
       const cls = aqi<=50?'good':aqi<=100?'mod':'bad';
       const lbl = aqi<=50?'좋음':aqi<=100?'보통':'나쁨';
-      if(aqi) pills.push(`<div class="pill ${cls}">AQI <b>${aqi} ${lbl}</b></div>`);
-      if(pm25) pills.push(`<div class="pill ${cls}">PM2.5 <b>${pm25.concentration?.value?.toFixed(1)}</b></div>`);
+      if(aqi) pills.push('<div class="pill '+cls+'">AQI <b>'+aqi+' '+lbl+'</b></div>');
+      if(pm25) pills.push('<div class="pill '+cls+'">PM2.5 <b>'+pm25.concentration?.value?.toFixed(1)+'</b></div>');
     }
     env = pills.join('');
   }
-  return `<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills">${env}</div></div>`;
+  return '<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills">'+env+'</div></div>';
 }
 
 function renderBottomTab(){
   const tabs = [{ico:'📋',l:'일정'},{ico:'🗺️',l:'지도'},{ico:'📍',l:'주변'},{ico:'🔧',l:'도구'}];
-  return '<div class="btab">' + tabs.map((t,i)=>
-    `<button class="btab-item${st.tab===i?' on':''}" data-tab="${i}"><span class="ico">${t.ico}</span>${t.l}</button>`
-  ).join('') + '</div>';
+  return '<div class="btab">' + tabs.map(function(t,i){
+    return '<button class="btab-item'+(st.tab===i?' on':'')+'" data-tab="'+i+'"><span class="ico">'+t.ico+'</span>'+t.l+'</button>';
+  }).join('') + '</div>';
 }
 
 function renderItinerary(){
   const day = DAYS[st.day];
-  let dtabs = '<div class="dtabs">' + DAYS.map((d,i)=>
-    `<div class="dtab${st.day===i?' on':''}" data-day="${i}">${d.label}<br><span style="font-size:10px">${d.date}</span></div>`
-  ).join('') + '</div>';
-  
-  let summary = `<div class="day-summary">${day.summary}</div>`;
-  
-  let spots = '<div class="spots">' + day.spots.map((s,i)=>{
-    const exp = st.expanded === i;
-    const vis = isVisited(st.day, i);
-    const bk = isBk(st.day, i);
-    const memo = getMemo(st.day, i);
-    const numCls = ['eat','snack'].includes(s.type) ? s.type : '';
-    return `<div class="scard${vis?' visited':''}" id="spot-${i}">
-      <div class="scard-top" data-spot="${i}">
-        <div class="scard-num ${numCls}">${i+1}</div>
-        <div class="scard-info">
-          <div class="scard-name">${s.name} <span class="ja">${s.ja}</span>
-            <span class="bk-star${bk?' on':''}" data-bk="${i}">${bk?'⭐':'☆'}</span>
-          </div>
-          <div class="scard-time">${TYPE_IC[s.type]||'📍'} ${s.time}${s.tags?' · '+s.tags[0]:''}</div>
-          <div class="scard-tags">${(s.tags||[]).map(t=>`<span class="stag">${t}</span>`).join('')}</div>
-        </div>
-      </div>
-      ${exp?`<div class="scard-detail">
-        ${s.note||''}
-        ${s.lat?`<div class="tip">📍 <a href="https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}" target="_blank" rel="noopener" style="color:var(--accent)">Google Maps에서 열기 →</a></div>`:''}
-        <div class="scard-actions">
-          <button class="${vis?'done':''}" data-vis="${i}">${vis?'✓ 방문완료':'방문 체크'}</button>
-          <button data-gmaps="${i}">길찾기</button>
-        </div>
-        <div class="memo-area">
-          <textarea placeholder="메모를 남겨보세요..." data-memo="${i}">${memo}</textarea>
-        </div>
-      </div>`:''}
-    </div>`;
+  const todayIdx = detectTodayIndex();
+  var dtabs = '<div class="dtabs">' + DAYS.map(function(d,i){
+    return '<div class="dtab'+(st.day===i?' on':'')+'" data-day="'+i+'">'+d.label+(i===todayIdx?'<span class="today-dot"></span>':'')+'<br><span style="font-size:10px">'+d.date+'</span></div>';
   }).join('') + '</div>';
-  
-  return `<div class="page${st.tab===0?' on':''}" id="pg-itin">${dtabs}${summary}${spots}</div>`;
+
+  var summary = '<div class="day-summary">'+day.summary+'</div>';
+
+  var spotsHtml = '<div class="spots">';
+  day.spots.forEach(function(s,i){
+    var exp = st.expanded === i;
+    var vis = isVisited(st.day, i);
+    var bk = isBk(st.day, i);
+    var memo = getMemo(st.day, i);
+    var numCls = ['eat','snack'].indexOf(s.type)>=0 ? s.type : '';
+
+    spotsHtml += '<div class="scard'+(vis?' visited':'')+'" id="spot-'+i+'">' +
+      '<div class="scard-top" data-spot="'+i+'">' +
+        '<div class="scard-num '+numCls+'">'+(i+1)+'</div>' +
+        '<div class="scard-info">' +
+          '<div class="scard-name">'+s.name+' <span class="ja">'+s.ja+'</span>' +
+            ' <span class="bk-star'+(bk?' on':'')+'" data-bk="'+i+'">'+(bk?'⭐':'☆')+'</span>' +
+          '</div>' +
+          '<div class="scard-time">'+(TYPE_IC[s.type]||'📍')+' '+s.time+(s.tags?' · '+s.tags[0]:'')+'</div>' +
+          '<div class="scard-tags">'+(s.tags||[]).map(function(t){return '<span class="stag">'+t+'</span>'}).join('')+'</div>' +
+        '</div>' +
+      '</div>';
+
+    if(exp){
+      spotsHtml += '<div class="scard-detail">' + (s.note||'');
+      if(s.lat){
+        spotsHtml += '<div class="deeplink-row">' +
+          '<a class="deeplink-btn" data-gapp="'+i+'">🗺 Google Maps</a>' +
+          '<a class="deeplink-btn" data-amap="'+i+'">🍎 Apple Maps</a>' +
+          '<a class="deeplink-btn" data-transit="'+i+'">🚃 길찾기</a>' +
+        '</div>';
+      }
+      spotsHtml += '<div class="scard-actions">' +
+        '<button class="'+(vis?'done':'')+'" data-vis="'+i+'">'+(vis?'✓ 방문완료':'방문 체크')+'</button>' +
+      '</div>' +
+      '<div class="memo-area">' +
+        '<textarea placeholder="메모를 남겨보세요..." data-memo="'+i+'">'+memo+'</textarea>' +
+      '</div></div>';
+    }
+
+    spotsHtml += '</div>';
+
+    // Transit connector between spots
+    if(i < day.spots.length - 1 && day.transit && day.transit[i]){
+      var tr = day.transit[i];
+      spotsHtml += '<div class="transit-conn">' +
+        '<span class="transit-icon">'+tr.icon+'</span>' +
+        '<span class="transit-time">'+tr.mode+' '+tr.time+'</span>' +
+      '</div>';
+    }
+  });
+  spotsHtml += '</div>';
+
+  return '<div class="page'+(st.tab===0?' on':'')+'" id="pg-itin">'+dtabs+summary+spotsHtml+'</div>';
 }
 
 function renderMapPage(){
-  return `<div class="page map-page${st.tab===1?' on':''}" id="pg-map">
-    <div class="dtabs">${DAYS.map((d,i)=>`<div class="dtab${st.day===i?' on':''}" data-day="${i}">${d.label}</div>`).join('')}</div>
-    <div id="map" style="flex:1"></div>
-  </div>`;
+  var dtabsHtml = '<div class="dtabs">'+DAYS.map(function(d,i){
+    return '<div class="dtab'+(st.day===i?' on':'')+'" data-day="'+i+'">'+d.label+'</div>';
+  }).join('')+'</div>';
+
+  if(mapLoadFailed){
+    return '<div class="page map-page'+(st.tab===1?' on':'')+'" id="pg-map">'+dtabsHtml+renderMapFallback()+'</div>';
+  }
+  return '<div class="page map-page'+(st.tab===1?' on':'')+'" id="pg-map">'+dtabsHtml+'<div id="map" style="flex:1"></div></div>';
+}
+
+function renderMapFallback(){
+  var day = DAYS[st.day];
+  var items = day.spots.map(function(s,i){
+    if(!s.lat) return '';
+    return '<div class="map-fb-item">' +
+      '<div class="name">'+(i+1)+'. '+s.name+' <span style="color:var(--dim);font-size:11px">'+s.ja+'</span></div>' +
+      '<div class="meta">'+(TYPE_IC[s.type]||'📍')+' '+s.time+' — '+(s.note||'')+'</div>' +
+      '<div class="map-fb-links">' +
+        '<a href="#" data-gapp="'+i+'">🗺 Google Maps</a>' +
+        '<a href="#" data-amap="'+i+'">🍎 Apple Maps</a>' +
+        '<a href="#" data-transit="'+i+'">🚃 길찾기</a>' +
+      '</div></div>';
+  }).join('');
+  return '<div class="map-fallback"><div class="map-fallback-title">📍 '+day.label+' — '+day.title+' (오프라인 목록)</div>'+items+'</div>';
 }
 
 function renderNearby(){
-  let chips = '<div class="nb-bar">' + NB_TYPES.map(t=>
-    `<div class="nb-chip${st.nbType===t.id?' on':''}" data-nb="${t.id}">${t.icon} ${t.label}</div>`
-  ).join('') + '</div>';
-  
-  let content = '';
+  var chips = '<div class="nb-bar">' + NB_TYPES.map(function(t){
+    return '<div class="nb-chip'+(st.nbType===t.id?' on':'')+'" data-nb="'+t.id+'">'+t.icon+' '+t.label+'</div>';
+  }).join('') + '</div>';
+
+  var content = '';
   if(!st.userLat){
-    content = `<div class="nb-status">현재 위치를 허용하면 주변 장소를 검색할 수 있어요.<button class="nb-gps-btn" id="gpsBtn">📍 위치 허용하기</button></div>`;
+    content = '<div class="nb-status">현재 위치를 허용하면 주변 장소를 검색할 수 있어요.<button class="nb-gps-btn" id="gpsBtn">📍 위치 허용하기</button></div>';
   } else if(st.nbLoading){
     content = '<div class="loading"><div class="spinner"></div>주변 검색 중...</div>';
   } else if(st.nbResults.length === 0){
     content = '<div class="nb-status">검색 결과가 없어요. 다른 카테고리를 선택해보세요.</div>';
   } else {
     content = '<div class="nb-map-wrap"><div id="mapNb"></div></div>' +
-      '<div class="nb-list">' + st.nbResults.map((r,i)=>{
-      const rating = r.rating ? `<span class="star">★ ${r.rating}</span> <span>(${r.userRatingCount||0})</span>` : '';
-      const open = r.currentOpeningHours?.openNow;
-      const openTxt = open===true?'<span style="color:var(--green)">영업중</span>':open===false?'<span style="color:var(--red)">영업종료</span>':'';
-      return `<div class="nb-item">
-        <div class="nb-item-name">${r.displayName?.text||'이름없음'}</div>
-        <div class="nb-item-meta">${rating} ${openTxt}</div>
-        <div class="nb-item-addr">${r.formattedAddress||''}</div>
-        ${r.googleMapsUri?`<a class="nb-item-link" href="${r.googleMapsUri}" target="_blank" rel="noopener">Google Maps에서 보기 →</a>`:''}
-      </div>`;
+      '<div class="nb-list">' + st.nbResults.map(function(r){
+      var rating = r.rating ? '<span class="star">★ '+r.rating+'</span> <span>('+( r.userRatingCount||0)+')</span>' : '';
+      var open = r.currentOpeningHours?.openNow;
+      var openTxt = open===true?'<span style="color:var(--green)">영업중</span>':open===false?'<span style="color:var(--red)">영업종료</span>':'';
+      return '<div class="nb-item">' +
+        '<div class="nb-item-name">'+(r.displayName?.text||'이름없음')+'</div>' +
+        '<div class="nb-item-meta">'+rating+' '+openTxt+'</div>' +
+        '<div class="nb-item-addr">'+(r.formattedAddress||'')+'</div>' +
+        (r.googleMapsUri?'<a class="nb-item-link" href="'+r.googleMapsUri+'" target="_blank" rel="noopener">Google Maps에서 보기 →</a>':'') +
+      '</div>';
     }).join('') + '</div>';
   }
-  
-  return `<div class="page${st.tab===2?' on':''}" id="pg-nb">${chips}${content}</div>`;
+
+  return '<div class="page'+(st.tab===2?' on':'')+'" id="pg-nb">'+chips+content+'</div>';
 }
 
 function renderTools(){
-  return `<div class="page${st.tab===3?' on':''}" id="pg-tools"><div class="tool-section">
-    <div class="tool-card"><h3>💱 환율 계산기</h3>
-      <div class="tool-row">
-        <input type="number" class="tool-input" id="krwInput" placeholder="원 (KRW)" inputmode="numeric">
-        <span style="font-size:18px">→</span>
-        <input type="number" class="tool-input" id="jpyInput" placeholder="엔 (JPY)" inputmode="numeric">
-      </div>
-      <div class="tool-rate" id="rateInfo">환율 로딩 중...</div>
-    </div>
-    
-    <div class="tool-card"><h3>🚨 긴급 연락처</h3>
-      <div class="emer-list">
-        <div class="emer-item"><span class="name">경찰</span><a href="tel:110">110</a></div>
-        <div class="emer-item"><span class="name">소방 / 구급</span><a href="tel:119">119</a></div>
-        <div class="emer-item"><span class="name">주일한국대사관</span><a href="tel:+81335520401">03-3452-7611</a></div>
-        <div class="emer-item"><span class="name">관광안내 (다국어)</span><a href="tel:+81570064372">050-3816-2787</a></div>
-      </div>
-    </div>
+  var cached = ls('rateCache');
+  var rateAge = '';
+  if(cached && cached.ts){
+    var mins = Math.floor((Date.now()-cached.ts)/60000);
+    if(mins<1) rateAge = '방금 전';
+    else if(mins<60) rateAge = mins+'분 전';
+    else if(mins<1440) rateAge = Math.floor(mins/60)+'시간 전';
+    else rateAge = Math.floor(mins/1440)+'일 전';
+  }
 
-    <div class="tool-card"><h3>🚃 교통 팁</h3>
-      <div class="transport-tip">
-        <b>스카이라이너</b>: 나리타↔우에노 41분, 편도 ¥2,520<br><br>
-        <b>Suica/Pasmo</b>: 편의점에서 충전. JR·메트로·버스 모두 사용 가능.<br><br>
-        <b>오시아게역 노선</b>: 한조몬선(직통), 아사쿠사선, 도부 스카이트리 라인<br><br>
-        <b>막차 주의</b>: 대부분 자정~0:30 막차. 야간에는 택시 이용.<br><br>
-        <b>Google Maps</b>: 일본 대중교통 검색 정확도 매우 높음. 적극 활용!
-      </div>
-    </div>
-    
-    <div class="tool-card"><h3>📌 유용한 일본어</h3>
-      <div class="info-grid">
-        <div class="info-item"><div class="label">감사합니다</div><div class="value">ありがとう</div></div>
-        <div class="info-item"><div class="label">실례합니다</div><div class="value">すみません</div></div>
-        <div class="info-item"><div class="label">얼마예요?</div><div class="value">いくらですか</div></div>
-        <div class="info-item"><div class="label">이거 주세요</div><div class="value">これください</div></div>
-        <div class="info-item"><div class="label">화장실 어디?</div><div class="value">トイレはどこ</div></div>
-        <div class="info-item"><div class="label">맛있어요</div><div class="value">おいしい</div></div>
-        <div class="info-item"><div class="label">계산 부탁</div><div class="value">お会計お願い</div></div>
-        <div class="info-item"><div class="label">도와주세요</div><div class="value">助けてください</div></div>
-      </div>
-    </div>
+  return '<div class="page'+(st.tab===3?' on':'')+'" id="pg-tools"><div class="tool-section">' +
+    '<div class="tool-card"><h3>💱 환율 계산기</h3>' +
+      '<div class="tool-row">' +
+        '<input type="number" class="tool-input" id="krwInput" placeholder="원 (KRW)" inputmode="numeric">' +
+        '<span style="font-size:18px">→</span>' +
+        '<input type="number" class="tool-input" id="jpyInput" placeholder="엔 (JPY)" inputmode="numeric">' +
+      '</div>' +
+      '<div class="tool-rate" id="rateInfo">1 KRW ≈ '+exchangeRate.toFixed(4)+' JPY'+(rateAge?' · 갱신: '+rateAge:'')+'</div>' +
+    '</div>' +
 
-    <div class="tool-card"><h3>⭐ 북마크한 장소</h3>
-      <div id="bkList" style="font-size:12px;color:var(--sub)">북마크한 장소가 없어요</div>
-    </div>
-  </div></div>`;
+    '<div class="tool-card"><h3>🚨 긴급 연락처</h3>' +
+      '<div class="emer-list">' +
+        '<div class="emer-item"><span class="name">경찰</span><a href="tel:110">110</a></div>' +
+        '<div class="emer-item"><span class="name">소방 / 구급</span><a href="tel:119">119</a></div>' +
+        '<div class="emer-item"><span class="name">주일한국대사관</span><a href="tel:+81335520401">03-3452-7611</a></div>' +
+        '<div class="emer-item"><span class="name">관광안내 (다국어)</span><a href="tel:+81570064372">050-3816-2787</a></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="tool-card"><h3>🚃 교통 팁</h3>' +
+      '<div class="transport-tip">' +
+        '<b>스카이라이너</b>: 나리타↔우에노 41분, 편도 ¥2,520<br><br>' +
+        '<b>Suica/Pasmo</b>: 편의점에서 충전. JR·메트로·버스 모두 사용 가능.<br><br>' +
+        '<b>오시아게역 노선</b>: 한조몬선(직통), 아사쿠사선, 도부 스카이트리 라인<br><br>' +
+        '<b>막차 주의</b>: 대부분 자정~0:30 막차. 야간에는 택시 이용.<br><br>' +
+        '<b>Google Maps</b>: 일본 대중교통 검색 정확도 매우 높음. 적극 활용!' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="tool-card"><h3>📶 오프라인 지도 안내</h3>' +
+      '<div class="transport-tip">' +
+        '<b>Google Maps 오프라인</b>: 앱 → 프로필 → 오프라인 지도 → 도쿄 영역 다운로드<br><br>' +
+        '<b>Apple Maps 오프라인</b>: 설정 → 지도 → 오프라인 지도 → 도쿄 추가<br><br>' +
+        '<b>추천</b>: 출발 전 WiFi에서 미리 다운로드. 지하철/실내에서도 지도 확인 가능!' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="tool-card"><h3>📌 유용한 일본어</h3>' +
+      '<div class="info-grid">' +
+        '<div class="info-item"><div class="label">감사합니다</div><div class="value">ありがとう</div></div>' +
+        '<div class="info-item"><div class="label">실례합니다</div><div class="value">すみません</div></div>' +
+        '<div class="info-item"><div class="label">얼마예요?</div><div class="value">いくらですか</div></div>' +
+        '<div class="info-item"><div class="label">이거 주세요</div><div class="value">これください</div></div>' +
+        '<div class="info-item"><div class="label">화장실 어디?</div><div class="value">トイレはどこ</div></div>' +
+        '<div class="info-item"><div class="label">맛있어요</div><div class="value">おいしい</div></div>' +
+        '<div class="info-item"><div class="label">계산 부탁</div><div class="value">お会計お願い</div></div>' +
+        '<div class="info-item"><div class="label">도와주세요</div><div class="value">助けてください</div></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="tool-card"><h3>⭐ 북마크한 장소</h3>' +
+      '<div id="bkList" style="font-size:12px;color:var(--sub)">북마크한 장소가 없어요</div>' +
+    '</div>' +
+  '</div></div>';
 }
 
 // === EVENTS ===
 function bindEvents(){
-  // Bottom tabs
-  document.querySelectorAll('.btab-item').forEach(el=>{
-    el.onclick = ()=>{ st.tab = +el.dataset.tab; render(); };
+  document.querySelectorAll('.btab-item').forEach(function(el){
+    el.onclick = function(){ st.tab = +el.dataset.tab; render(); };
   });
-  // Day tabs
-  document.querySelectorAll('.dtab').forEach(el=>{
-    el.onclick = ()=>{ st.day = +el.dataset.day; st.expanded = null; render(); };
+  document.querySelectorAll('.dtab').forEach(function(el){
+    el.onclick = function(){ st.day = +el.dataset.day; st.expanded = null; render(); };
   });
-  // Spot expand
-  document.querySelectorAll('.scard-top').forEach(el=>{
-    el.onclick = (e)=>{
+  document.querySelectorAll('.scard-top').forEach(function(el){
+    el.onclick = function(e){
       if(e.target.classList.contains('bk-star')) return;
-      const i = +el.dataset.spot;
+      var i = +el.dataset.spot;
       st.expanded = st.expanded===i ? null : i;
       render();
-      if(st.expanded!==null) setTimeout(()=>{
-        const card = document.getElementById('spot-'+i);
+      if(st.expanded!==null) setTimeout(function(){
+        var card = document.getElementById('spot-'+i);
         if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
       },50);
     };
   });
-  // Bookmark
-  document.querySelectorAll('.bk-star').forEach(el=>{
-    el.onclick = (e)=>{ e.stopPropagation(); toggleBk(st.day, +el.dataset.bk); };
+  document.querySelectorAll('.bk-star').forEach(function(el){
+    el.onclick = function(e){ e.stopPropagation(); toggleBk(st.day, +el.dataset.bk); };
   });
-  // Visit toggle
-  document.querySelectorAll('[data-vis]').forEach(el=>{
-    el.onclick = ()=> toggleVisited(st.day, +el.dataset.vis);
+  document.querySelectorAll('[data-vis]').forEach(function(el){
+    el.onclick = function(){ toggleVisited(st.day, +el.dataset.vis); };
   });
-  // Google Maps navigation
-  document.querySelectorAll('[data-gmaps]').forEach(el=>{
-    el.onclick = ()=>{
-      const s = DAYS[st.day].spots[+el.dataset.gmaps];
-      if(s.lat) window.open(`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=transit`,'_blank');
+  // Deep links: Google Maps App
+  document.querySelectorAll('[data-gapp]').forEach(function(el){
+    el.onclick = function(e){
+      e.preventDefault();
+      var s = DAYS[st.day].spots[+el.dataset.gapp];
+      if(s.lat) openGoogleMapsApp(s.lat,s.lng,s.name);
+    };
+  });
+  // Deep links: Apple Maps
+  document.querySelectorAll('[data-amap]').forEach(function(el){
+    el.onclick = function(e){
+      e.preventDefault();
+      var s = DAYS[st.day].spots[+el.dataset.amap];
+      if(s.lat) openAppleMaps(s.lat,s.lng,s.name);
+    };
+  });
+  // Deep links: Transit
+  document.querySelectorAll('[data-transit]').forEach(function(el){
+    el.onclick = function(e){
+      e.preventDefault();
+      var s = DAYS[st.day].spots[+el.dataset.transit];
+      if(s.lat) openTransitDirections(s.lat,s.lng);
     };
   });
   // Memo save
-  document.querySelectorAll('[data-memo]').forEach(el=>{
-    el.oninput = ()=> setMemo(st.day, +el.dataset.memo, el.value);
+  document.querySelectorAll('[data-memo]').forEach(function(el){
+    el.oninput = function(){ setMemo(st.day, +el.dataset.memo, el.value); };
   });
   // GPS button
-  const gpsBtn = document.getElementById('gpsBtn');
+  var gpsBtn = document.getElementById('gpsBtn');
   if(gpsBtn) gpsBtn.onclick = requestGPS;
   // Nearby chips
-  document.querySelectorAll('.nb-chip').forEach(el=>{
-    el.onclick = ()=>{ st.nbType = el.dataset.nb; if(st.userLat) searchNearby(); render(); };
+  document.querySelectorAll('.nb-chip').forEach(function(el){
+    el.onclick = function(){ st.nbType = el.dataset.nb; if(st.userLat) searchNearby(); render(); };
   });
   // Currency
-  const krwIn = document.getElementById('krwInput');
-  const jpyIn = document.getElementById('jpyInput');
-  if(krwIn) krwIn.oninput = ()=>{ jpyIn.value = krwIn.value ? Math.round(krwIn.value * exchangeRate) : ''; };
-  if(jpyIn) jpyIn.oninput = ()=>{ krwIn.value = jpyIn.value ? Math.round(jpyIn.value / exchangeRate) : ''; };
-  
+  var krwIn = document.getElementById('krwInput');
+  var jpyIn = document.getElementById('jpyInput');
+  if(krwIn) krwIn.oninput = function(){ jpyIn.value = krwIn.value ? Math.round(krwIn.value * exchangeRate) : ''; };
+  if(jpyIn) jpyIn.oninput = function(){ krwIn.value = jpyIn.value ? Math.round(jpyIn.value / exchangeRate) : ''; };
+
   // Bookmarks list
-  const bkList = document.getElementById('bkList');
+  var bkList = document.getElementById('bkList');
   if(bkList){
-    const bks = ls('bk')||{};
-    const items = Object.keys(bks).filter(k=>bks[k]).map(k=>{
-      const [d,s] = k.split('-').map(Number);
-      const spot = DAYS[d]?.spots[s];
+    var bks = ls('bk')||{};
+    var items = Object.keys(bks).filter(function(k){return bks[k]}).map(function(k){
+      var parts = k.split('-').map(Number);
+      var spot = DAYS[parts[0]]?.spots[parts[1]];
       if(!spot) return '';
-      return `<div style="padding:6px 0;border-bottom:1px solid var(--border)">${DAYS[d].label} · ${spot.name} <span style="color:var(--dim)">${spot.ja}</span></div>`;
+      return '<div style="padding:6px 0;border-bottom:1px solid var(--border)">'+DAYS[parts[0]].label+' · '+spot.name+' <span style="color:var(--dim)">'+spot.ja+'</span></div>';
     }).filter(Boolean);
     bkList.innerHTML = items.length ? items.join('') : '북마크한 장소가 없어요';
   }
-  
-  // Rate info
-  const rateEl = document.getElementById('rateInfo');
-  if(rateEl) rateEl.textContent = `1 KRW ≈ ${exchangeRate.toFixed(4)} JPY (참고용)`;
 }
 
 // === GOOGLE MAPS ===
-let mapReady = false;
+var mapReady = false;
 function initMap(){
   mapReady = true;
+  clearTimeout(mapLoadTimer);
   initMapIfNeeded();
   render();
   fetchEnvData();
@@ -487,9 +652,9 @@ function initMap(){
 
 function initMapIfNeeded(){
   if(!mapReady) return;
-  
+
   if(st.tab === 0 || st.tab === 1){
-    const el = document.getElementById('map');
+    var el = document.getElementById('map');
     if(!el) return;
     if(!map){
       map = new google.maps.Map(el, {
@@ -504,32 +669,30 @@ function initMapIfNeeded(){
     }
     updateMapMarkers();
   }
-  
+
   if(st.tab === 2 && st.userLat && st.nbResults.length){
-    setTimeout(()=>{
-      const el = document.getElementById('mapNb');
+    setTimeout(function(){
+      var el = document.getElementById('mapNb');
       if(!el || mapNb) return;
       mapNb = new google.maps.Map(el, {
         center:{lat:st.userLat,lng:st.userLng}, zoom:15,
         mapTypeControl:false, fullscreenControl:false, streetViewControl:false, zoomControl:false,
         styles:[{featureType:'poi.business',stylers:[{visibility:'off'}]}]
       });
-      // User marker
       new google.maps.Marker({position:{lat:st.userLat,lng:st.userLng},map:mapNb,
         icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:'#4285f4',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
       });
-      // Result markers
-      st.nbResults.forEach((r,i)=>{
-        const loc = r.location;
+      st.nbResults.forEach(function(r,i){
+        var loc = r.location;
         if(!loc) return;
-        const m = new google.maps.Marker({position:{lat:loc.latitude,lng:loc.longitude},map:mapNb,
+        var m = new google.maps.Marker({position:{lat:loc.latitude,lng:loc.longitude},map:mapNb,
           label:{text:String(i+1),fontSize:'10px',color:'#fff'},
           icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:'#1a1a1a',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
         });
-        const info = new google.maps.InfoWindow({
-          content:`<div style="font-size:12px;font-family:sans-serif"><b>${r.displayName?.text||''}</b><br>★ ${r.rating||'-'}</div>`
+        var info = new google.maps.InfoWindow({
+          content:'<div style="font-size:12px;font-family:sans-serif"><b>'+(r.displayName?.text||'')+'</b><br>★ '+(r.rating||'-')+'</div>'
         });
-        m.addListener('click',()=>info.open(mapNb,m));
+        m.addListener('click',function(){info.open(mapNb,m)});
       });
     },100);
   }
@@ -537,46 +700,54 @@ function initMapIfNeeded(){
 
 function updateMapMarkers(){
   if(!map) return;
-  markers.forEach(m=>m.setMap(null));
+  markers.forEach(function(m){m.setMap(null)});
   markers = [];
   if(polyline) polyline.setMap(null);
-  
-  const day = DAYS[st.day];
-  const bounds = new google.maps.LatLngBounds();
-  const pts = [];
-  
-  day.spots.forEach((s,i)=>{
+
+  var day = DAYS[st.day];
+  var bounds = new google.maps.LatLngBounds();
+  var pts = [];
+
+  day.spots.forEach(function(s,i){
     if(!s.lat) return;
-    const colors = {eat:'#b8860b',snack:'#aaa',shop:'#888',spot:'#1a1a1a',transport:'#ccc',hotel:'#555'};
-    const c = colors[s.type]||'#999';
-    const m = new google.maps.Marker({
+    var colors = {eat:'#b8860b',snack:'#aaa',shop:'#888',spot:'#1a1a1a',transport:'#ccc',hotel:'#555'};
+    var c = colors[s.type]||'#999';
+    var m = new google.maps.Marker({
       position:{lat:s.lat,lng:s.lng}, map:map,
       icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:c,fillOpacity:1,strokeColor:'#fff',strokeWeight:2},
       label:{text:String(i+1),fontSize:'10px',color:'#fff',fontWeight:'bold'},
       title:s.name
     });
-    const info = new google.maps.InfoWindow({
-      content:`<div style="font-family:sans-serif;font-size:12px;max-width:200px"><b>${s.name}</b><br><span style="color:#999;font-size:10px">${s.ja||''}</span><br><span style="font-size:10px;color:#666">${s.note||''}</span></div>`
+    var info = new google.maps.InfoWindow({
+      content:'<div style="font-family:sans-serif;font-size:12px;max-width:200px"><b>'+s.name+'</b><br><span style="color:#999;font-size:10px">'+(s.ja||'')+'</span><br><span style="font-size:10px;color:#666">'+(s.note||'')+'</span></div>'
     });
-    m.addListener('click',()=>info.open(map,m));
+    m.addListener('click',function(){info.open(map,m)});
     markers.push(m);
     bounds.extend({lat:s.lat,lng:s.lng});
     pts.push({lat:s.lat,lng:s.lng});
   });
-  
+
   if(pts.length > 1){
     polyline = new google.maps.Polyline({path:pts,geodesic:true,strokeColor:'#ccc',strokeWeight:1.5,strokeOpacity:.7,map:map});
   }
-  
+
   if(pts.length) map.fitBounds(bounds,{top:60,bottom:80,left:40,right:40});
 }
+
+// === MAP LOAD TIMEOUT ===
+var mapLoadTimer = setTimeout(function(){
+  if(!mapReady){
+    mapLoadFailed = true;
+    render();
+  }
+},10000);
 
 // === NEARBY SEARCH (Places API) ===
 function requestGPS(){
   if(!navigator.geolocation){alert('GPS를 지원하지 않는 브라우저예요.');return;}
   navigator.geolocation.getCurrentPosition(
-    pos=>{ st.userLat=pos.coords.latitude; st.userLng=pos.coords.longitude; searchNearby(); },
-    err=>{ alert('위치 권한을 허용해주세요.'); },
+    function(pos){ st.userLat=pos.coords.latitude; st.userLng=pos.coords.longitude; searchNearby(); },
+    function(){ alert('위치 권한을 허용해주세요.'); },
     {enableHighAccuracy:true,timeout:10000}
   );
 }
@@ -586,10 +757,10 @@ async function searchNearby(){
   st.nbResults = [];
   mapNb = null;
   render();
-  
-  const typeInfo = NB_TYPES.find(t=>t.id===st.nbType);
+
+  var typeInfo = NB_TYPES.find(function(t){return t.id===st.nbType});
   try{
-    const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+    var res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
       method:'POST',
       headers:{
         'Content-Type':'application/json',
@@ -602,54 +773,74 @@ async function searchNearby(){
         locationRestriction:{circle:{center:{latitude:st.userLat,longitude:st.userLng},radius:800}}
       })
     });
-    const data = await res.json();
-    st.nbResults = (data.places||[]).sort((a,b)=>(b.rating||0)-(a.rating||0));
+    var data = await res.json();
+    st.nbResults = (data.places||[]).sort(function(a,b){return (b.rating||0)-(a.rating||0)});
   }catch(e){ console.error(e); }
-  
+
   st.nbLoading = false;
   render();
 }
 
 // === ENV DATA ===
 async function fetchEnvData(){
-  const lat = HOTEL.lat, lng = HOTEL.lng;
-  // Weather
+  var lat = HOTEL.lat, lng = HOTEL.lng;
   try{
-    const r = await fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${API_KEY}&location.latitude=${lat}&location.longitude=${lng}&languageCode=ko`);
+    var r = await fetch('https://weather.googleapis.com/v1/currentConditions:lookup?key='+API_KEY+'&location.latitude='+lat+'&location.longitude='+lng+'&languageCode=ko');
     weatherData = await r.json();
   }catch(e){}
-  // AQI
   try{
-    const r = await fetch(`https://airquality.googleapis.com/v1/currentConditions:lookup?key=${API_KEY}`,{
+    var r2 = await fetch('https://airquality.googleapis.com/v1/currentConditions:lookup?key='+API_KEY,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({location:{latitude:lat,longitude:lng},extraComputations:['POLLUTANT_CONCENTRATION']})
     });
-    aqiData = await r.json();
+    aqiData = await r2.json();
   }catch(e){}
   render();
 }
 
-// === EXCHANGE RATE ===
-let exchangeRate = 0.1085; // fallback
+// === EXCHANGE RATE (with offline caching) ===
+var exchangeRate = 0.1085;
+(function loadCachedRate(){
+  var cached = ls('rateCache');
+  if(cached && cached.rate) exchangeRate = cached.rate;
+})();
+
 async function fetchRate(){
   try{
-    const r = await fetch('https://open.er-api.com/v6/latest/KRW');
-    const d = await r.json();
-    if(d.rates?.JPY) exchangeRate = d.rates.JPY;
-  }catch(e){}
+    var r = await fetch('https://open.er-api.com/v6/latest/KRW');
+    var d = await r.json();
+    if(d.rates && d.rates.JPY){
+      exchangeRate = d.rates.JPY;
+      ls('rateCache',{rate:exchangeRate,ts:Date.now()});
+    }
+  }catch(e){
+    // offline: use cached rate
+  }
 }
+
+// === OFFLINE INDICATOR ===
+function updateOfflineBanner(){
+  var banner = document.getElementById('offlineBanner');
+  if(banner){
+    if(navigator.onLine) banner.classList.remove('show');
+    else banner.classList.add('show');
+  }
+}
+window.addEventListener('online',function(){ updateOfflineBanner(); fetchRate(); });
+window.addEventListener('offline',updateOfflineBanner);
 
 // === SERVICE WORKER ===
 if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('/tokyo-pwa/sw.js').catch(()=>{});
+  navigator.serviceWorker.register('/tokyo-pwa/sw.js').catch(function(){});
 }
 
 // === INIT ===
 fetchRate();
+updateOfflineBanner();
 
 // Initial render before Google Maps loads
-document.getElementById('app').innerHTML = `<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills"><div class="pill">로딩...</div></div></div><div class="content"><div class="page on" style="display:flex;align-items:center;justify-content:center;height:100%;padding-bottom:72px"><div class="loading"><div class="spinner"></div>지도 로딩 중...</div></div></div><div class="btab"><button class="btab-item on"><span class="ico">📋</span>일정</button><button class="btab-item"><span class="ico">🗺️</span>지도</button><button class="btab-item"><span class="ico">📍</span>주변</button><button class="btab-item"><span class="ico">🔧</span>도구</button></div>`;
+document.getElementById('app').innerHTML = '<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills"><div class="pill">로딩...</div></div></div><div class="content"><div class="page on" style="display:flex;align-items:center;justify-content:center;height:100%;padding-bottom:72px"><div class="loading"><div class="spinner"></div>지도 로딩 중...</div></div></div><div class="btab"><button class="btab-item on"><span class="ico">📋</span>일정</button><button class="btab-item"><span class="ico">🗺️</span>지도</button><button class="btab-item"><span class="ico">📍</span>주변</button><button class="btab-item"><span class="ico">🔧</span>도구</button></div>';
 </script>
 <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNOf3Kz4ehJzLJ8D20WWoaI8qYu3dcI0s&loading=async&callback=initMap"></script>
 </body>
