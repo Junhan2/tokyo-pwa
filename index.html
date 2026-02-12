@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tokyo 2026">
+<meta name="theme-color" content="#1a1a1a">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a1a1a'/><text y='68' x='50' text-anchor='middle' font-size='50' fill='white'>🗼</text></svg>">
+<title>Tokyo 2026</title>
+<style>
+:root{--bg:#f5f5f5;--card:#fff;--text:#1a1a1a;--sub:#666;--dim:#999;--border:#e8e8e8;--accent:#1a1a1a;--tag:#f0f0f0;--gold:#b8860b;--green:#22c55e;--orange:#f59e0b;--red:#ef4444;--r:14px;--safe-b:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100dvh;-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100dvh}
+
+/* Header */
+.hdr{background:var(--card);padding:12px 16px;padding-top:calc(env(safe-area-inset-top,12px) + 8px);border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.hdr-left h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.hdr-left .sub{font-size:10px;color:var(--dim);margin-top:1px}
+.env-pills{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{font-size:9px;padding:3px 8px;border-radius:12px;background:var(--tag);color:var(--sub);white-space:nowrap;display:flex;align-items:center;gap:3px}
+.pill b{color:var(--text);font-weight:600}
+.pill.good b{color:var(--green)}.pill.mod b{color:var(--orange)}.pill.bad b{color:var(--red)}
+
+/* Content area */
+.content{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;padding-bottom:calc(72px + var(--safe-b))}
+.page.on{display:block}
+.page.map-page{padding-bottom:calc(72px + var(--safe-b));overflow:hidden}
+
+/* Bottom Tab Bar */
+.btab{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-b);z-index:100}
+.btab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 0 4px;cursor:pointer;color:var(--dim);transition:color .15s;font-size:10px;gap:2px;border:none;background:none;font-family:inherit}
+.btab-item.on{color:var(--accent);font-weight:600}
+.btab-item .ico{font-size:20px;line-height:1}
+
+/* Day Tabs */
+.dtabs{display:flex;gap:6px;padding:12px 16px 8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.dtabs::-webkit-scrollbar{display:none}
+.dtab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--dim);transition:all .15s;white-space:nowrap}
+.dtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Spot Cards */
+.spots{padding:0 16px 16px}
+.scard{background:var(--card);border-radius:var(--r);margin-bottom:10px;border:1px solid var(--border);overflow:hidden;transition:border-color .15s}
+.scard.visited{opacity:.65}
+.scard-top{padding:14px 16px;cursor:pointer;display:flex;align-items:flex-start;gap:12px}
+.scard-num{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.scard-num.eat{background:var(--gold)}
+.scard-num.shop{background:#888}
+.scard-num.snack{background:#aaa}
+.scard-info{flex:1;min-width:0}
+.scard-name{font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px}
+.scard-name .ja{font-size:11px;color:var(--dim);font-weight:400}
+.scard-time{font-size:11px;color:var(--sub);margin-top:2px}
+.scard-tags{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.stag{font-size:9px;padding:2px 8px;border-radius:10px;background:var(--tag);color:var(--sub)}
+.scard-detail{padding:0 16px 14px;font-size:12px;color:var(--sub);line-height:1.7;border-top:1px solid var(--border);margin-top:0;padding-top:12px}
+.scard-detail .tip{background:#fafafa;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:11px}
+.scard-actions{display:flex;gap:8px;margin-top:10px}
+.scard-actions button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.scard-actions button:active{background:var(--tag)}
+.scard-actions button.done{background:var(--accent);color:#fff;border-color:var(--accent)}
+.memo-area{margin-top:8px}
+.memo-area textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;min-height:60px;outline:none}
+
+/* Map */
+#map{width:100%;height:100%}
+
+/* Nearby / Discover */
+.nb-bar{padding:12px 16px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.nb-bar::-webkit-scrollbar{display:none}
+.nb-chip{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;color:var(--sub);transition:all .15s}
+.nb-chip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nb-list{padding:0 16px 16px}
+.nb-item{background:var(--card);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;border:1px solid var(--border)}
+.nb-item-name{font-size:14px;font-weight:600}
+.nb-item-meta{font-size:11px;color:var(--sub);margin-top:3px;display:flex;align-items:center;gap:8px}
+.nb-item-meta .star{color:var(--gold)}
+.nb-item-addr{font-size:11px;color:var(--dim);margin-top:4px}
+.nb-item-link{display:inline-block;margin-top:6px;font-size:11px;color:var(--accent);text-decoration:none;font-weight:500}
+.nb-status{text-align:center;padding:40px 16px;color:var(--dim);font-size:13px}
+.nb-gps-btn{display:block;margin:12px auto;padding:10px 24px;border-radius:20px;border:1px solid var(--accent);background:var(--card);font-size:13px;cursor:pointer;font-family:inherit;font-weight:500}
+.nb-map-wrap{height:220px;margin:0 16px 12px;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+
+/* Tools */
+.tool-section{padding:16px}
+.tool-card{background:var(--card);border-radius:var(--r);padding:16px;margin-bottom:12px;border:1px solid var(--border)}
+.tool-card h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.tool-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.tool-input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.tool-input:focus{border-color:var(--accent)}
+.tool-result{font-size:20px;font-weight:700;text-align:center;padding:8px 0}
+.tool-rate{font-size:11px;color:var(--dim);text-align:center}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-item{background:#fafafa;padding:10px 12px;border-radius:8px}
+.info-item .label{font-size:10px;color:var(--dim);margin-bottom:2px}
+.info-item .value{font-size:13px;font-weight:600}
+.info-item .value a{color:var(--accent);text-decoration:none}
+.emer-list{display:flex;flex-direction:column;gap:6px}
+.emer-item{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:#fafafa;border-radius:8px}
+.emer-item .name{font-size:12px;font-weight:500}
+.emer-item a{font-size:13px;font-weight:700;color:var(--accent);text-decoration:none}
+.transport-tip{font-size:12px;color:var(--sub);line-height:1.7;padding:6px 0}
+.transport-tip b{color:var(--text)}
+
+/* Bookmark star */
+.bk-star{cursor:pointer;font-size:16px;opacity:.3;transition:opacity .15s}
+.bk-star.on{opacity:1}
+
+/* Loading */
+.loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:20px;color:var(--dim);font-size:12px}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Day summary */
+.day-summary{padding:12px 16px;font-size:12px;color:var(--sub);line-height:1.6;background:var(--card);margin:0 16px 12px;border-radius:var(--r);border:1px solid var(--border)}
+.day-summary .weather-row{display:flex;gap:12px;margin-top:6px}
+.day-summary .weather-row .wi{display:flex;align-items:center;gap:4px;font-size:11px}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+
+<script>
+// === CONFIG ===
+const API_KEY = 'AIzaSyBNOf3Kz4ehJzLJ8D20WWoaI8qYu3dcI0s';
+const HOTEL = { lat: 35.7102, lng: 139.8116, name: 'Richmond Hotel Tokyo Skhole' };
+
+// === DATA: 5-Day Itinerary ===
+const DAYS = [
+  {
+    date:'2/13 (목)', label:'Day 1', title:'도착 · 아사쿠사',
+    summary:'나리타 도착 → 스카이라이너로 우에노 → 오시아게 호텔 체크인 후 아사쿠사 산책. 센소지와 나카미세도리를 천천히 둘러보고 저녁은 현지 이자카야에서.',
+    spots:[
+      {name:'나리타공항 도착',ja:'成田空港',time:'14:00',type:'transport',lat:35.7647,lng:140.3864,note:'스카이라이너 → 우에노 (41분) → 호텔 체크인',tags:['도착','스카이라이너']},
+      {name:'Richmond Hotel',ja:'リッチモンドホテル東京スコーレ',time:'15:30',type:'hotel',lat:35.7102,lng:139.8116,note:'오시아게역 도보 3분. 스카이트리 뷰.',tags:['숙소','체크인']},
+      {name:'도쿄 스카이트리',ja:'東京スカイツリー',time:'16:00',type:'spot',lat:35.7101,lng:139.8107,note:'호텔 바로 옆. 전망대는 시간 여유 있으면.',tags:['랜드마크','전망']},
+      {name:'센소지',ja:'浅草寺',time:'17:00',type:'spot',lat:35.7148,lng:139.7967,note:'아사쿠사의 상징. 저녁 무렵 라이트업이 아름다움.',tags:['사찰','필수']},
+      {name:'나카미세도리',ja:'仲見世通り',time:'17:30',type:'shop',lat:35.7135,lng:139.7966,note:'닝교야끼, 아게만쥬 등 간식 거리.',tags:['쇼핑','간식']},
+      {name:'카게츠도 메론빵',ja:'花月堂',time:'17:45',type:'snack',lat:35.7145,lng:139.7941,note:'얼굴 크기 메론빵. 아사쿠사 필수 간식.',tags:['간식','필수']},
+      {name:'호프만 (저녁)',ja:'ホッピー通り',time:'19:00',type:'eat',lat:35.7118,lng:139.7960,note:'홋피도리(호프만 거리). 현지인 분위기 이자카야 골목. 모츠니코미 추천.',tags:['저녁','이자카야','현지맛집']}
+    ]
+  },
+  {
+    date:'2/14 (금)', label:'Day 2', title:'🗻 후지산 투어',
+    summary:'마이리얼트립 한국어 가이드 후지산 1일 투어. 도쿄역 7:45 집합, 8:00 출발. 혼마치 거리 → 아라쿠라야마 센겐 공원 → 오시노 핫카이 → 가와구치코. 저녁은 오시아게 복귀 후.',
+    spots:[
+      {name:'도쿄역 집합',ja:'東京駅 丸の内南口',time:'07:45',type:'transport',lat:35.6812,lng:139.7671,note:'마루노우치 남쪽 출구 → 신마루노우치 빌딩 BEAMS 간판 아래 1층. 오시아게에서 한조몬선→오테마치 약 20분.',tags:['집합','마이리얼트립']},
+      {name:'혼마치 거리',ja:'本町通り',time:'10:00',type:'spot',lat:35.4875,lng:138.8031,note:'후지요시다 레트로 쇼핑 스트리트. 후지산 배경 포토스팟.',tags:['투어','포토스팟']},
+      {name:'아라쿠라야마 센겐 공원',ja:'新倉山浅間公園',time:'11:30',type:'spot',lat:35.5031,lng:138.7989,note:'오층탑 + 후지산 = 일본 대표 풍경. 397계단 올라가야 함.',tags:['투어','절경','필수']},
+      {name:'오시노 핫카이',ja:'忍野八海',time:'13:30',type:'spot',lat:35.4612,lng:138.8312,note:'후지산 눈녹은 물이 만든 8개의 맑은 연못. 두부 아이스크림 추천.',tags:['투어','자연']},
+      {name:'가와구치코',ja:'河口湖',time:'15:00',type:'spot',lat:35.5162,lng:138.7520,note:'가와구치코 자연생활관. 후지산 + 호수 전경.',tags:['투어','호수']},
+      {name:'호텔 복귀',ja:'',time:'18:30',type:'transport',lat:35.7102,lng:139.8116,note:'투어 종료 후 오시아게 복귀.',tags:['이동']},
+      {name:'덴노스케 (저녁)',ja:'でんのすけ',time:'19:30',type:'eat',lat:35.7108,lng:139.8130,note:'오시아게역 근처 오뎅 이자카야. 따뜻한 오뎅으로 하루 마무리.',tags:['저녁','오뎅','현지맛집']}
+    ]
+  },
+  {
+    date:'2/15 (토)', label:'Day 3', title:'츠키지 · 긴자 · 시부야',
+    summary:'아침은 츠키지 시장에서 해산물 먹방. 긴자에서 쇼핑 후 시부야로 이동. 하치코 → 시부야 스크램블 → 시부야 스카이 전망대.',
+    spots:[
+      {name:'츠키지 시장',ja:'築地場外市場',time:'09:00',type:'eat',lat:35.6654,lng:139.7707,note:'타마고야키, 해산물 덮밥, 스시 등. 아침 겸 점심으로 먹방.',tags:['아침','시장','먹방']},
+      {name:'긴자 산책',ja:'銀座',time:'11:30',type:'shop',lat:35.6722,lng:139.7649,note:'유니클로 긴자점, 무인양품, 이토야 문구 등.',tags:['쇼핑','거리']},
+      {name:'긴자 사이토 (점심)',ja:'銀座さいとう',time:'12:30',type:'eat',lat:35.6710,lng:139.7632,note:'두툼한 돈카츠 명가. 점심 줄 서지만 빠르게 회전.',tags:['점심','돈카츠','명가']},
+      {name:'시부야 하치코',ja:'忠犬ハチ公像',time:'14:30',type:'spot',lat:35.6590,lng:139.7006,note:'시부야역 앞 하치코 동상. 포토스팟.',tags:['랜드마크','포토스팟']},
+      {name:'시부야 스크램블',ja:'渋谷スクランブル交差点',time:'14:45',type:'spot',lat:35.6595,lng:139.7004,note:'세계에서 가장 바쁜 교차로. 스타벅스 2층에서 내려다보기.',tags:['랜드마크']},
+      {name:'시부야 스카이',ja:'SHIBUYA SKY',time:'15:30',type:'spot',lat:35.6584,lng:139.7024,note:'230m 옥상 전망대. 해질녘 추천. 사전 예매 필수.',tags:['전망대','예매필수']},
+      {name:'규카츠 모토무라 (저녁)',ja:'牛かつもと村',time:'18:00',type:'eat',lat:35.6612,lng:139.6980,note:'바삭한 규카츠를 돌판에 구워 먹는 맛. 시부야점.',tags:['저녁','규카츠','인기']}
+    ]
+  },
+  {
+    date:'2/16 (일)', label:'Day 4', title:'하라주쿠 · 신주쿠',
+    summary:'하라주쿠에서 다케시타도리, 오모테산도 거리 산책. 메이지진구 참배 후 신주쿠로 이동. 가부키초 타워, 골든가이 탐방.',
+    spots:[
+      {name:'메이지진구',ja:'明治神宮',time:'09:30',type:'spot',lat:35.6764,lng:139.6993,note:'도심 속 거대한 숲. 아침에 방문하면 한적하고 경건.',tags:['신사','필수','아침추천']},
+      {name:'다케시타도리',ja:'竹下通り',time:'11:00',type:'shop',lat:35.6702,lng:139.7025,note:'하라주쿠의 상징. 크레이프, 솜사탕, 개성 넘치는 가게들.',tags:['쇼핑','거리']},
+      {name:'하라주쿠 크레이프',ja:'マリオンクレープ',time:'11:20',type:'snack',lat:35.6699,lng:139.7027,note:'다케시타도리 입구. 딸기 초코 크레이프 추천.',tags:['간식']},
+      {name:'오모테산도',ja:'表参道',time:'11:45',type:'shop',lat:35.6654,lng:139.7121,note:'세련된 가로수길. 건축물 자체가 볼거리.',tags:['쇼핑','건축']},
+      {name:'카모토네기 (점심)',ja:'鴨to葱',time:'12:30',type:'eat',lat:35.6670,lng:139.7090,note:'오리 라멘 명가. 진한 국물과 오리고기가 일품.',tags:['점심','라멘','명가']},
+      {name:'신주쿠 가부키초 타워',ja:'歌舞伎町タワー',time:'15:00',type:'spot',lat:35.6946,lng:139.7015,note:'2023 오픈. 엔터테인먼트 복합시설.',tags:['랜드마크','신규']},
+      {name:'신주쿠 골든가이',ja:'新宿ゴールデン街',time:'17:00',type:'spot',lat:35.6944,lng:139.7041,note:'좁은 골목에 200개 이상 작은 바. 분위기 자체가 매력.',tags:['거리','바']},
+      {name:'오모이데 요코초 (저녁)',ja:'思い出横丁',time:'19:00',type:'eat',lat:35.6932,lng:139.6985,note:'신주쿠 서쪽 출구 야키토리 골목. 연기 자욱한 레트로 분위기.',tags:['저녁','야키토리','골목맛집']}
+    ]
+  },
+  {
+    date:'2/17 (월)', label:'Day 5', title:'마지막 쇼핑 · 출발',
+    summary:'오전에 아키하바라 또는 우에노에서 마지막 쇼핑. 오후 나리타 공항으로 이동.',
+    spots:[
+      {name:'호텔 체크아웃',ja:'',time:'10:00',type:'hotel',lat:35.7102,lng:139.8116,note:'짐은 프론트에 맡기고 가볍게 이동.',tags:['체크아웃']},
+      {name:'아키하바라',ja:'秋葉原',time:'10:30',type:'shop',lat:35.6984,lng:139.7731,note:'전자제품, 피규어, 면세 쇼핑. 요도바시 카메라 추천.',tags:['쇼핑','전자제품']},
+      {name:'우에노 아메요코',ja:'アメ横',time:'11:30',type:'shop',lat:35.7089,lng:139.7745,note:'재래시장 분위기. 간식, 건어물, 화장품 등.',tags:['쇼핑','시장']},
+      {name:'점심',ja:'',time:'12:00',type:'eat',lat:35.7089,lng:139.7745,note:'우에노/아키하바라 근처에서 가볍게. 라멘이나 소바.',tags:['점심']},
+      {name:'나리타 공항 이동',ja:'成田空港',time:'14:00',type:'transport',lat:35.7647,lng:140.3864,note:'우에노 → 스카이라이너 41분. 출발 2시간 전 도착 목표.',tags:['출발','스카이라이너']}
+    ]
+  }
+];
+
+const TYPE_IC = {spot:'📍',eat:'🍽️',snack:'🍡',shop:'🛍️',transport:'🚃',hotel:'🏨'};
+const NB_TYPES = [
+  {id:'restaurant',label:'맛집',icon:'🍽️',google:'restaurant'},
+  {id:'cafe',label:'카페',icon:'☕',google:'cafe'},
+  {id:'convenience_store',label:'편의점',icon:'🏪',google:'convenience_store'},
+  {id:'tourist_attraction',label:'관광지',icon:'🏛️',google:'tourist_attraction'},
+  {id:'shopping_mall',label:'쇼핑',icon:'🛍️',google:'shopping_mall'},
+  {id:'drugstore',label:'드럭스토어',icon:'💊',google:'drugstore'}
+];
+
+// === STATE ===
+let st = {
+  tab: 0,        // 0=일정, 1=지도, 2=주변, 3=도구
+  day: 0,
+  expanded: null,
+  nbType: 'restaurant',
+  nbResults: [],
+  nbLoading: false,
+  userLat: null,
+  userLng: null
+};
+let map = null, mapNb = null, markers = [], markersNb = [], polyline = null;
+let weatherData = null, aqiData = null;
+
+// === STORAGE ===
+function ls(k,v){
+  if(v===undefined) try{return JSON.parse(localStorage.getItem('tk26_'+k))}catch(e){return null}
+  localStorage.setItem('tk26_'+k, JSON.stringify(v));
+}
+function isVisited(d,s){return !!(ls('visited')||{})[d+'-'+s]}
+function toggleVisited(d,s){const v=ls('visited')||{};const k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('visited',v);render()}
+function isBk(d,s){return !!(ls('bk')||{})[d+'-'+s]}
+function toggleBk(d,s){const v=ls('bk')||{};const k=d+'-'+s;v[k]=!v[k];if(!v[k])delete v[k];ls('bk',v);render()}
+function getMemo(d,s){return (ls('memos')||{})[d+'-'+s]||''}
+function setMemo(d,s,txt){const m=ls('memos')||{};m[d+'-'+s]=txt;if(!txt)delete m[d+'-'+s];ls('memos',m)}
+
+// === RENDER ===
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = renderHeader() + '<div class="content">' +
+    renderItinerary() + renderMapPage() + renderNearby() + renderTools() +
+    '</div>' + renderBottomTab();
+  bindEvents();
+  if(st.tab === 0 || st.tab === 1) initMapIfNeeded();
+}
+
+function renderHeader(){
+  let env = '<div class="pill">로딩...</div>';
+  if(weatherData || aqiData){
+    let pills = [];
+    if(weatherData){
+      const t = weatherData.temperature?.degrees;
+      const h = weatherData.humidity?.percent;
+      if(t!==undefined) pills.push(`<div class="pill">🌡 <b>${Math.round(t)}°</b></div>`);
+      if(h!==undefined) pills.push(`<div class="pill">💧 <b>${h}%</b></div>`);
+    }
+    if(aqiData){
+      const idx = aqiData.indexes?.[0];
+      const aqi = idx?.aqi;
+      const pm25 = aqiData.pollutants?.find(p=>p.code==='pm25');
+      const cls = aqi<=50?'good':aqi<=100?'mod':'bad';
+      const lbl = aqi<=50?'좋음':aqi<=100?'보통':'나쁨';
+      if(aqi) pills.push(`<div class="pill ${cls}">AQI <b>${aqi} ${lbl}</b></div>`);
+      if(pm25) pills.push(`<div class="pill ${cls}">PM2.5 <b>${pm25.concentration?.value?.toFixed(1)}</b></div>`);
+    }
+    env = pills.join('');
+  }
+  return `<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills">${env}</div></div>`;
+}
+
+function renderBottomTab(){
+  const tabs = [{ico:'📋',l:'일정'},{ico:'🗺️',l:'지도'},{ico:'📍',l:'주변'},{ico:'🔧',l:'도구'}];
+  return '<div class="btab">' + tabs.map((t,i)=>
+    `<button class="btab-item${st.tab===i?' on':''}" data-tab="${i}"><span class="ico">${t.ico}</span>${t.l}</button>`
+  ).join('') + '</div>';
+}
+
+function renderItinerary(){
+  const day = DAYS[st.day];
+  let dtabs = '<div class="dtabs">' + DAYS.map((d,i)=>
+    `<div class="dtab${st.day===i?' on':''}" data-day="${i}">${d.label}<br><span style="font-size:10px">${d.date}</span></div>`
+  ).join('') + '</div>';
+  
+  let summary = `<div class="day-summary">${day.summary}</div>`;
+  
+  let spots = '<div class="spots">' + day.spots.map((s,i)=>{
+    const exp = st.expanded === i;
+    const vis = isVisited(st.day, i);
+    const bk = isBk(st.day, i);
+    const memo = getMemo(st.day, i);
+    const numCls = ['eat','snack'].includes(s.type) ? s.type : '';
+    return `<div class="scard${vis?' visited':''}" id="spot-${i}">
+      <div class="scard-top" data-spot="${i}">
+        <div class="scard-num ${numCls}">${i+1}</div>
+        <div class="scard-info">
+          <div class="scard-name">${s.name} <span class="ja">${s.ja}</span>
+            <span class="bk-star${bk?' on':''}" data-bk="${i}">${bk?'⭐':'☆'}</span>
+          </div>
+          <div class="scard-time">${TYPE_IC[s.type]||'📍'} ${s.time}${s.tags?' · '+s.tags[0]:''}</div>
+          <div class="scard-tags">${(s.tags||[]).map(t=>`<span class="stag">${t}</span>`).join('')}</div>
+        </div>
+      </div>
+      ${exp?`<div class="scard-detail">
+        ${s.note||''}
+        ${s.lat?`<div class="tip">📍 <a href="https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}" target="_blank" rel="noopener" style="color:var(--accent)">Google Maps에서 열기 →</a></div>`:''}
+        <div class="scard-actions">
+          <button class="${vis?'done':''}" data-vis="${i}">${vis?'✓ 방문완료':'방문 체크'}</button>
+          <button data-gmaps="${i}">길찾기</button>
+        </div>
+        <div class="memo-area">
+          <textarea placeholder="메모를 남겨보세요..." data-memo="${i}">${memo}</textarea>
+        </div>
+      </div>`:''}
+    </div>`;
+  }).join('') + '</div>';
+  
+  return `<div class="page${st.tab===0?' on':''}" id="pg-itin">${dtabs}${summary}${spots}</div>`;
+}
+
+function renderMapPage(){
+  return `<div class="page map-page${st.tab===1?' on':''}" id="pg-map">
+    <div class="dtabs">${DAYS.map((d,i)=>`<div class="dtab${st.day===i?' on':''}" data-day="${i}">${d.label}</div>`).join('')}</div>
+    <div id="map" style="flex:1"></div>
+  </div>`;
+}
+
+function renderNearby(){
+  let chips = '<div class="nb-bar">' + NB_TYPES.map(t=>
+    `<div class="nb-chip${st.nbType===t.id?' on':''}" data-nb="${t.id}">${t.icon} ${t.label}</div>`
+  ).join('') + '</div>';
+  
+  let content = '';
+  if(!st.userLat){
+    content = `<div class="nb-status">현재 위치를 허용하면 주변 장소를 검색할 수 있어요.<button class="nb-gps-btn" id="gpsBtn">📍 위치 허용하기</button></div>`;
+  } else if(st.nbLoading){
+    content = '<div class="loading"><div class="spinner"></div>주변 검색 중...</div>';
+  } else if(st.nbResults.length === 0){
+    content = '<div class="nb-status">검색 결과가 없어요. 다른 카테고리를 선택해보세요.</div>';
+  } else {
+    content = '<div class="nb-map-wrap"><div id="mapNb"></div></div>' +
+      '<div class="nb-list">' + st.nbResults.map((r,i)=>{
+      const rating = r.rating ? `<span class="star">★ ${r.rating}</span> <span>(${r.userRatingCount||0})</span>` : '';
+      const open = r.currentOpeningHours?.openNow;
+      const openTxt = open===true?'<span style="color:var(--green)">영업중</span>':open===false?'<span style="color:var(--red)">영업종료</span>':'';
+      return `<div class="nb-item">
+        <div class="nb-item-name">${r.displayName?.text||'이름없음'}</div>
+        <div class="nb-item-meta">${rating} ${openTxt}</div>
+        <div class="nb-item-addr">${r.formattedAddress||''}</div>
+        ${r.googleMapsUri?`<a class="nb-item-link" href="${r.googleMapsUri}" target="_blank" rel="noopener">Google Maps에서 보기 →</a>`:''}
+      </div>`;
+    }).join('') + '</div>';
+  }
+  
+  return `<div class="page${st.tab===2?' on':''}" id="pg-nb">${chips}${content}</div>`;
+}
+
+function renderTools(){
+  return `<div class="page${st.tab===3?' on':''}" id="pg-tools"><div class="tool-section">
+    <div class="tool-card"><h3>💱 환율 계산기</h3>
+      <div class="tool-row">
+        <input type="number" class="tool-input" id="krwInput" placeholder="원 (KRW)" inputmode="numeric">
+        <span style="font-size:18px">→</span>
+        <input type="number" class="tool-input" id="jpyInput" placeholder="엔 (JPY)" inputmode="numeric">
+      </div>
+      <div class="tool-rate" id="rateInfo">환율 로딩 중...</div>
+    </div>
+    
+    <div class="tool-card"><h3>🚨 긴급 연락처</h3>
+      <div class="emer-list">
+        <div class="emer-item"><span class="name">경찰</span><a href="tel:110">110</a></div>
+        <div class="emer-item"><span class="name">소방 / 구급</span><a href="tel:119">119</a></div>
+        <div class="emer-item"><span class="name">주일한국대사관</span><a href="tel:+81335520401">03-3452-7611</a></div>
+        <div class="emer-item"><span class="name">관광안내 (다국어)</span><a href="tel:+81570064372">050-3816-2787</a></div>
+      </div>
+    </div>
+
+    <div class="tool-card"><h3>🚃 교통 팁</h3>
+      <div class="transport-tip">
+        <b>스카이라이너</b>: 나리타↔우에노 41분, 편도 ¥2,520<br><br>
+        <b>Suica/Pasmo</b>: 편의점에서 충전. JR·메트로·버스 모두 사용 가능.<br><br>
+        <b>오시아게역 노선</b>: 한조몬선(직통), 아사쿠사선, 도부 스카이트리 라인<br><br>
+        <b>막차 주의</b>: 대부분 자정~0:30 막차. 야간에는 택시 이용.<br><br>
+        <b>Google Maps</b>: 일본 대중교통 검색 정확도 매우 높음. 적극 활용!
+      </div>
+    </div>
+    
+    <div class="tool-card"><h3>📌 유용한 일본어</h3>
+      <div class="info-grid">
+        <div class="info-item"><div class="label">감사합니다</div><div class="value">ありがとう</div></div>
+        <div class="info-item"><div class="label">실례합니다</div><div class="value">すみません</div></div>
+        <div class="info-item"><div class="label">얼마예요?</div><div class="value">いくらですか</div></div>
+        <div class="info-item"><div class="label">이거 주세요</div><div class="value">これください</div></div>
+        <div class="info-item"><div class="label">화장실 어디?</div><div class="value">トイレはどこ</div></div>
+        <div class="info-item"><div class="label">맛있어요</div><div class="value">おいしい</div></div>
+        <div class="info-item"><div class="label">계산 부탁</div><div class="value">お会計お願い</div></div>
+        <div class="info-item"><div class="label">도와주세요</div><div class="value">助けてください</div></div>
+      </div>
+    </div>
+
+    <div class="tool-card"><h3>⭐ 북마크한 장소</h3>
+      <div id="bkList" style="font-size:12px;color:var(--sub)">북마크한 장소가 없어요</div>
+    </div>
+  </div></div>`;
+}
+
+// === EVENTS ===
+function bindEvents(){
+  // Bottom tabs
+  document.querySelectorAll('.btab-item').forEach(el=>{
+    el.onclick = ()=>{ st.tab = +el.dataset.tab; render(); };
+  });
+  // Day tabs
+  document.querySelectorAll('.dtab').forEach(el=>{
+    el.onclick = ()=>{ st.day = +el.dataset.day; st.expanded = null; render(); };
+  });
+  // Spot expand
+  document.querySelectorAll('.scard-top').forEach(el=>{
+    el.onclick = (e)=>{
+      if(e.target.classList.contains('bk-star')) return;
+      const i = +el.dataset.spot;
+      st.expanded = st.expanded===i ? null : i;
+      render();
+      if(st.expanded!==null) setTimeout(()=>{
+        const card = document.getElementById('spot-'+i);
+        if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+      },50);
+    };
+  });
+  // Bookmark
+  document.querySelectorAll('.bk-star').forEach(el=>{
+    el.onclick = (e)=>{ e.stopPropagation(); toggleBk(st.day, +el.dataset.bk); };
+  });
+  // Visit toggle
+  document.querySelectorAll('[data-vis]').forEach(el=>{
+    el.onclick = ()=> toggleVisited(st.day, +el.dataset.vis);
+  });
+  // Google Maps navigation
+  document.querySelectorAll('[data-gmaps]').forEach(el=>{
+    el.onclick = ()=>{
+      const s = DAYS[st.day].spots[+el.dataset.gmaps];
+      if(s.lat) window.open(`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}&travelmode=transit`,'_blank');
+    };
+  });
+  // Memo save
+  document.querySelectorAll('[data-memo]').forEach(el=>{
+    el.oninput = ()=> setMemo(st.day, +el.dataset.memo, el.value);
+  });
+  // GPS button
+  const gpsBtn = document.getElementById('gpsBtn');
+  if(gpsBtn) gpsBtn.onclick = requestGPS;
+  // Nearby chips
+  document.querySelectorAll('.nb-chip').forEach(el=>{
+    el.onclick = ()=>{ st.nbType = el.dataset.nb; if(st.userLat) searchNearby(); render(); };
+  });
+  // Currency
+  const krwIn = document.getElementById('krwInput');
+  const jpyIn = document.getElementById('jpyInput');
+  if(krwIn) krwIn.oninput = ()=>{ jpyIn.value = krwIn.value ? Math.round(krwIn.value * exchangeRate) : ''; };
+  if(jpyIn) jpyIn.oninput = ()=>{ krwIn.value = jpyIn.value ? Math.round(jpyIn.value / exchangeRate) : ''; };
+  
+  // Bookmarks list
+  const bkList = document.getElementById('bkList');
+  if(bkList){
+    const bks = ls('bk')||{};
+    const items = Object.keys(bks).filter(k=>bks[k]).map(k=>{
+      const [d,s] = k.split('-').map(Number);
+      const spot = DAYS[d]?.spots[s];
+      if(!spot) return '';
+      return `<div style="padding:6px 0;border-bottom:1px solid var(--border)">${DAYS[d].label} · ${spot.name} <span style="color:var(--dim)">${spot.ja}</span></div>`;
+    }).filter(Boolean);
+    bkList.innerHTML = items.length ? items.join('') : '북마크한 장소가 없어요';
+  }
+  
+  // Rate info
+  const rateEl = document.getElementById('rateInfo');
+  if(rateEl) rateEl.textContent = `1 KRW ≈ ${exchangeRate.toFixed(4)} JPY (참고용)`;
+}
+
+// === GOOGLE MAPS ===
+let mapReady = false;
+function initMap(){
+  mapReady = true;
+  initMapIfNeeded();
+  render();
+  fetchEnvData();
+}
+
+function initMapIfNeeded(){
+  if(!mapReady) return;
+  
+  if(st.tab === 0 || st.tab === 1){
+    const el = document.getElementById('map');
+    if(!el) return;
+    if(!map){
+      map = new google.maps.Map(el, {
+        center:{lat:HOTEL.lat,lng:HOTEL.lng}, zoom:13,
+        mapTypeControl:false, fullscreenControl:false, streetViewControl:false,
+        zoomControl:true,
+        styles:[
+          {featureType:'poi.business',stylers:[{visibility:'off'}]},
+          {featureType:'transit',elementType:'labels.icon',stylers:[{visibility:'off'}]}
+        ]
+      });
+    }
+    updateMapMarkers();
+  }
+  
+  if(st.tab === 2 && st.userLat && st.nbResults.length){
+    setTimeout(()=>{
+      const el = document.getElementById('mapNb');
+      if(!el || mapNb) return;
+      mapNb = new google.maps.Map(el, {
+        center:{lat:st.userLat,lng:st.userLng}, zoom:15,
+        mapTypeControl:false, fullscreenControl:false, streetViewControl:false, zoomControl:false,
+        styles:[{featureType:'poi.business',stylers:[{visibility:'off'}]}]
+      });
+      // User marker
+      new google.maps.Marker({position:{lat:st.userLat,lng:st.userLng},map:mapNb,
+        icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:'#4285f4',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
+      });
+      // Result markers
+      st.nbResults.forEach((r,i)=>{
+        const loc = r.location;
+        if(!loc) return;
+        const m = new google.maps.Marker({position:{lat:loc.latitude,lng:loc.longitude},map:mapNb,
+          label:{text:String(i+1),fontSize:'10px',color:'#fff'},
+          icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:'#1a1a1a',fillOpacity:1,strokeColor:'#fff',strokeWeight:2}
+        });
+        const info = new google.maps.InfoWindow({
+          content:`<div style="font-size:12px;font-family:sans-serif"><b>${r.displayName?.text||''}</b><br>★ ${r.rating||'-'}</div>`
+        });
+        m.addListener('click',()=>info.open(mapNb,m));
+      });
+    },100);
+  }
+}
+
+function updateMapMarkers(){
+  if(!map) return;
+  markers.forEach(m=>m.setMap(null));
+  markers = [];
+  if(polyline) polyline.setMap(null);
+  
+  const day = DAYS[st.day];
+  const bounds = new google.maps.LatLngBounds();
+  const pts = [];
+  
+  day.spots.forEach((s,i)=>{
+    if(!s.lat) return;
+    const colors = {eat:'#b8860b',snack:'#aaa',shop:'#888',spot:'#1a1a1a',transport:'#ccc',hotel:'#555'};
+    const c = colors[s.type]||'#999';
+    const m = new google.maps.Marker({
+      position:{lat:s.lat,lng:s.lng}, map:map,
+      icon:{path:google.maps.SymbolPath.CIRCLE,scale:12,fillColor:c,fillOpacity:1,strokeColor:'#fff',strokeWeight:2},
+      label:{text:String(i+1),fontSize:'10px',color:'#fff',fontWeight:'bold'},
+      title:s.name
+    });
+    const info = new google.maps.InfoWindow({
+      content:`<div style="font-family:sans-serif;font-size:12px;max-width:200px"><b>${s.name}</b><br><span style="color:#999;font-size:10px">${s.ja||''}</span><br><span style="font-size:10px;color:#666">${s.note||''}</span></div>`
+    });
+    m.addListener('click',()=>info.open(map,m));
+    markers.push(m);
+    bounds.extend({lat:s.lat,lng:s.lng});
+    pts.push({lat:s.lat,lng:s.lng});
+  });
+  
+  if(pts.length > 1){
+    polyline = new google.maps.Polyline({path:pts,geodesic:true,strokeColor:'#ccc',strokeWeight:1.5,strokeOpacity:.7,map:map});
+  }
+  
+  if(pts.length) map.fitBounds(bounds,{top:60,bottom:80,left:40,right:40});
+}
+
+// === NEARBY SEARCH (Places API) ===
+function requestGPS(){
+  if(!navigator.geolocation){alert('GPS를 지원하지 않는 브라우저예요.');return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{ st.userLat=pos.coords.latitude; st.userLng=pos.coords.longitude; searchNearby(); },
+    err=>{ alert('위치 권한을 허용해주세요.'); },
+    {enableHighAccuracy:true,timeout:10000}
+  );
+}
+
+async function searchNearby(){
+  st.nbLoading = true;
+  st.nbResults = [];
+  mapNb = null;
+  render();
+  
+  const typeInfo = NB_TYPES.find(t=>t.id===st.nbType);
+  try{
+    const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-Goog-Api-Key':API_KEY,
+        'X-Goog-FieldMask':'places.displayName,places.rating,places.userRatingCount,places.formattedAddress,places.location,places.currentOpeningHours,places.googleMapsUri,places.primaryTypeDisplayName'
+      },
+      body:JSON.stringify({
+        includedTypes:[typeInfo.google],
+        maxResultCount:15,
+        locationRestriction:{circle:{center:{latitude:st.userLat,longitude:st.userLng},radius:800}}
+      })
+    });
+    const data = await res.json();
+    st.nbResults = (data.places||[]).sort((a,b)=>(b.rating||0)-(a.rating||0));
+  }catch(e){ console.error(e); }
+  
+  st.nbLoading = false;
+  render();
+}
+
+// === ENV DATA ===
+async function fetchEnvData(){
+  const lat = HOTEL.lat, lng = HOTEL.lng;
+  // Weather
+  try{
+    const r = await fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${API_KEY}&location.latitude=${lat}&location.longitude=${lng}&languageCode=ko`);
+    weatherData = await r.json();
+  }catch(e){}
+  // AQI
+  try{
+    const r = await fetch(`https://airquality.googleapis.com/v1/currentConditions:lookup?key=${API_KEY}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({location:{latitude:lat,longitude:lng},extraComputations:['POLLUTANT_CONCENTRATION']})
+    });
+    aqiData = await r.json();
+  }catch(e){}
+  render();
+}
+
+// === EXCHANGE RATE ===
+let exchangeRate = 0.1085; // fallback
+async function fetchRate(){
+  try{
+    const r = await fetch('https://open.er-api.com/v6/latest/KRW');
+    const d = await r.json();
+    if(d.rates?.JPY) exchangeRate = d.rates.JPY;
+  }catch(e){}
+}
+
+// === SERVICE WORKER ===
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').catch(()=>{});
+}
+
+// === INIT ===
+fetchRate();
+
+// Initial render before Google Maps loads
+document.getElementById('app').innerHTML = `<div class="hdr"><div class="hdr-left"><h1>Tokyo 2026</h1><div class="sub">2.13 — 2.17 · 커플 여행 · 오시아게</div></div><div class="env-pills"><div class="pill">로딩...</div></div></div><div class="content"><div class="page on" style="display:flex;align-items:center;justify-content:center;height:100%;padding-bottom:72px"><div class="loading"><div class="spinner"></div>지도 로딩 중...</div></div></div><div class="btab"><button class="btab-item on"><span class="ico">📋</span>일정</button><button class="btab-item"><span class="ico">🗺️</span>지도</button><button class="btab-item"><span class="ico">📍</span>주변</button><button class="btab-item"><span class="ico">🔧</span>도구</button></div>`;
+</script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBNOf3Kz4ehJzLJ8D20WWoaI8qYu3dcI0s&loading=async&callback=initMap"></script>
+</body>
+</html>
